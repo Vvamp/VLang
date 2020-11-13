@@ -1,2 +1,2 @@
 # VLang
-VLang Interpreter Language
+A statically typed interpreter language for the ATP class
