@@ -3,62 +3,63 @@ version="0.0.1"
 print("--Hello VLang--") 
 
 class Token:
-    def __init__(self, linenr, content):
+    def __init__(self, linenr: int, tokentype: int, symbol: str):
         self.linenr = linenr 
-        self.content = content 
+        self.tokentype = tokentype 
+        self.symbol = symbol 
+
+def addTokenToLexmap(lexmap, token):
+    tokens = lexmap.append(token)
+    return tokens 
 
 
+def isToken(word, typestocheck):
+    if len(typestocheck) == 1:
+        return word == typestocheck[0]
+    else:
+        return (word == typestocheck[0]) | isToken(word, typestocheck[1:])
 
-def lex(all_lines):
-   specialCharacters = ["}", "{", ")", "(", "\"", "\'", "//", ","] 
-   tokens = []
-   firsttoken = Token("-1", "check")
-   current_line = 0
-   for line in all_lines:
-       # If line is empty, ignore the line
-        if line == "":
-           continue 
-    
-        # Increase line
-        current_line = current_line + 1
-        
-        for word in line.split(" "): 
-            currentlyInText=False
-            for i in range(0, len(word)):
-                if word[i] in specialCharacters:
-                    print("letter is special <3")
-                    if currentlyInText:
-                        continue 
-                    else:
-                        tokens.append(Token(current_line, word[i]))
-                        
-                        print("Removing letter")
-                else:
-                    continue
-              
-            tokens.append(Token(current_line, word))
+def tokenise(line):
+    lorem = ['goto', 'location']
+    if isToken("int", prim_types):
+        print("TOKEN!")
+    return [line, line]
 
 
-   # magic to decode
-   # decode per line and write each line to tokens
-   # if line is empty, ignore it!
-   tokens.append(firsttoken)
-   print(tokens)
-   for token in tokens:
-       print(f"- {token}\t{token.linenr}\t{token.content}")
+def lexrec(lines, tokenedlines = []):
+    if len(lines) == 1:
+        tokenedlines = tokenedlines + tokenise(lines[0])
+        return tokenedlines
+    else:
+        tokenedlines = tokenedlines + tokenise(lines[0])
+        tokenedlines = tokenedlines + lexrec(lines[1:])
+        return tokenedlines
+
+def lex(lines):
+    lexlist = []
+    all_test = lexrec(lines)
+    print(all_test)
+    a = Token(1, 2, "HI")
+    b = Token(2, 4, "Hey")
+    return [a,b]
+
+
+def printTokens(lex):
+    print("Tokens:")
+    for i in range(0, len(lex)):
+        print(f'ID: {i} Line: {lex[i].linenr} Type: {lex[i].tokentype} Symbol: {lex[i].symbol}')
+
 
 
 def main(argv):
-    for _file in argv:
-        f = open(_file, "r")
-        all_lines = []
-        for line in f:
-            all_lines.append(line)
-            print("Command > " + line.strip("\n"))
-            # lex(line)
-        f.close()
+    #todo: read multiple files
+    f = open(argv[0], "r")
+    all_lines = f.readlines()
+    f.close()
+    lexmap = lex(all_lines)
+    
+    printTokens(lexmap)
 
-        lex(all_lines)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

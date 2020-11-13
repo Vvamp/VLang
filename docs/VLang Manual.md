@@ -14,3 +14,20 @@ The syntax is similar to C++, but instructions are split by newlines instead of 
 sysout = print
 class instance variables and methods are accessible per-method/variable. i.e. *private* void main()
 
+
+goto name -- goes to location
+location a -- defines location
+
+if(){
+
+
+}
+
+while(){
+
+}
+
+type function_name(params, seperated){
+    
+}
+
