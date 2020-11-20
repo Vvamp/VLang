@@ -1,4 +1,5 @@
 import sys, getopt 
+import copy
 version="0.0.1"
 print("--Hello VLang--") 
 
@@ -8,16 +9,22 @@ class Token:
         self.tokentype = tokentype 
         self.symbol = symbol 
 
+class ASTNode:
+    def __init__(self, nodetype: str, LHS: str, RHS: str):
+        self.nodetype = nodetype 
+        self.LHS = LHS 
+        self.RHS = RHS 
+
 
 def lexrec_words(words, linenr):
     keywords = ['location', 'goto', 'string']
     if len(words) == 1:
         if words[0] == keywords[0]:
-            return [Token(linenr, keywords[0], words[0])]
+            return [Token(linenr, keywords[0], words[0].replace("\n", ""))]
         elif words[0] == keywords[1]:
-            return [Token(linenr, keywords[1], words[0])]
+            return [Token(linenr, keywords[1], words[0].replace("\n", ""))]
         else:
-            return [Token(linenr, keywords[2], words[0])]
+            return [Token(linenr, keywords[2], words[0].replace("\n", ""))]
     else:
         if len(words[1:]) > 1:
             # If there are more than 2 words or more left, besides index 0, then don't convert it to another list
@@ -94,11 +101,80 @@ def printTokens(lex):
     for i in range(0, len(lex)):
         print(f'ID: {i} Line: {lex[i].linenr} Type: {lex[i].tokentype} Symbol: {lex[i].symbol}')
 
+def printAST(astTree):
+    print("AST: ")
+    for node in astTree:
+        print(f"Type: {node.nodetype} LHS: {node.LHS} RHS: {node.RHS}")
+
+def parse_location_lhs(lexmap):
+    identifier = lexmap[0].symbol
+    lexmap.pop(0)
+    if identifier == "location":
+        return identifier 
+    else:
+        return None
+
+def parse_location_rhs(lexmap):
+    name = lexmap[0].symbol 
+    lexmap.pop(0)
+    return name 
 
 
+def parse_location(lexmap):
+    LHS_Node = parse_location_lhs(lexmap)
+    if LHS_Node == None: 
+        return False, None
+    RHS_Node = parse_location_rhs(lexmap)
+    if RHS_Node is None or RHS_Node == "":
+        return False, None 
+    node = ASTNode("location", LHS_Node, RHS_Node)
+    return True, node
+    
+def parse_goto_lhs(lexmap):
+    identifier = lexmap[0].symbol
+    lexmap.pop(0)
+    if identifier == "goto":
+        return identifier 
+    else:
+        return None
+
+def parse_goto_rhs(lexmap):
+    name = lexmap[0].symbol 
+    lexmap.pop(0)
+    return name 
 
 
-# install docstring extension
+def parse_goto(lexmap):
+    LHS_Node = parse_goto_lhs(lexmap)
+    if LHS_Node == None: 
+        return False, None 
+    RHS_Node = parse_goto_rhs(lexmap)
+
+    if RHS_Node is None or RHS_Node == "":
+        return False, None 
+
+    node = ASTNode("goto", LHS_Node, RHS_Node)
+    return True, node
+
+def parse(lexmap):
+    astTree = []
+    while len(lexmap) > 0:
+        lexcopy = copy.deepcopy(lexmap)
+        result, node = parse_location(lexmap)
+        if result is True and node is not None:
+            astTree.append(node)
+            continue 
+        lexmap = lexcopy
+
+        result, node = parse_goto(lexmap)
+        if result is True and node is not None:
+            astTree.append(node)
+            continue 
+
+        raise Exception("Failed to create AST node")
+    return astTree
+            
+
 
 def main(argv):
     #todo: read multiple files
@@ -106,9 +182,10 @@ def main(argv):
     all_lines = f.readlines()
     f.close()
     lexmap = lex(all_lines)
-    
     printTokens(lexmap)
+    astTree = parse(copy.deepcopy(lexmap))
 
+    printAST(astTree)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
