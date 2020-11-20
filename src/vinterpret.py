@@ -8,40 +8,49 @@ class Token:
         self.tokentype = tokentype 
         self.symbol = symbol 
 
-def addTokenToLexmap(lexmap, token):
-    tokens = lexmap.append(token)
-    return tokens 
+
+def lexrec_word(word):
+    return
+
+def lexrec_line(line):
+    """
+    Return a list of tokens from a line
+    """
+    #todo: don't fix this
+    keywords = ['location', 'goto']
+    tokens = []
+    for word in line.split(' '): 
+        if word in keywords:
+            myToken = Token(0, 0, word) 
+            tokens.append(myToken)
+        else:
+            myToken = Token(0, 1, word)
+            tokens.append(myToken)
+    return tokens
+            
+
+    
+    
 
 
-def isToken(word, typestocheck):
-    if len(typestocheck) == 1:
-        return word == typestocheck[0]
-    else:
-        return (word == typestocheck[0]) | isToken(word, typestocheck[1:])
-
-def tokenise(line):
-    lorem = ['goto', 'location']
-    if isToken("int", prim_types):
-        print("TOKEN!")
-    return [line, line]
-
-
-def lexrec(lines, tokenedlines = []):
+def lexrec_lines(lines):
+    """
+    Return a list of tokens from all lines
+    """
     if len(lines) == 1:
-        tokenedlines = tokenedlines + tokenise(lines[0])
-        return tokenedlines
+        return lexrec_line(lines[0])
     else:
-        tokenedlines = tokenedlines + tokenise(lines[0])
-        tokenedlines = tokenedlines + lexrec(lines[1:])
-        return tokenedlines
+        return lexrec_line(lines[0]) + lexrec_lines(lines[1:])
+
 
 def lex(lines):
+    """
+    Should output a list of Tokens
+    """
     lexlist = []
-    all_test = lexrec(lines)
-    print(all_test)
-    a = Token(1, 2, "HI")
-    b = Token(2, 4, "Hey")
-    return [a,b]
+    all_tokens = lexrec_lines(lines)
+    print(all_tokens)
+    return all_tokens
 
 
 def printTokens(lex):
@@ -50,6 +59,8 @@ def printTokens(lex):
         print(f'ID: {i} Line: {lex[i].linenr} Type: {lex[i].tokentype} Symbol: {lex[i].symbol}')
 
 
+
+# install docstring extension
 
 def main(argv):
     #todo: read multiple files
