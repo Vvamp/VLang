@@ -1,6 +1,7 @@
 import sys, getopt 
 import copy
 import functools
+from typing import List
 
 class Token:
     def __init__(self, tokentype : str, symbol : str):
@@ -21,18 +22,25 @@ class TokenList:
         self.tokenlist = self.tokenlist[1:] # pop 
         return theToken
 
+class ASTNode:
+    def __init__(self, nodetype: str, LHS: str, RHS: str):
+        self.nodetype = nodetype 
+        self.LHS = LHS 
+        self.RHS = RHS 
+
+
 
 def check_location(tokenlist):
     if tokenlist.next() != 'location':
         return False, None 
     # return True, (Token('a', 'b'), Token('b','c')
-    return True, (Token('LOCATION', 'location'), Token('NAME', tokenlist.next())) 
+    return True, [Token('LOCATION', 'location'), Token('NAME', tokenlist.next())] 
     
 def check_goto(tokenlist):
     if tokenlist.next() != 'goto':
         return False, None 
     # return True, (Token('a', 'b'), Token('b','c')
-    return True, (Token('GOTO', 'goto'), Token('NAME', tokenlist.next())) 
+    return True, [Token('GOTO', 'goto'), Token('NAME', tokenlist.next())]
     
 
 
@@ -54,8 +62,16 @@ def parse_tokens(tokenlist):
 
         
 
+def flatten(unflattened_list : List[List[Token]]) -> List[Token]:
+    if len(unflattened_list) == 0:
+        return []
+    head, *tail = unflattened_list
+
+    return head + flatten(tail)
+
 def parser(tokenmap):
-    return list(map(parse_tokens, tokenmap))
+    parsedmap = list(map(parse_tokens, tokenmap))
+    return flatten(parsedmap)
     # return tokenmap 
 
 def lexer(lines):
@@ -63,12 +79,13 @@ def lexer(lines):
 
 
 def printParsed(parsedmap):
+    print(parsedmap)
     print('{:<15} {:<20}'.format("[Type]", "[Symbol]"))
-    for tokens in parsedmap:
-        for token in tokens:
-            # print("{token.tokentype}: {token.symbol}")
+    for token in parsedmap:
             print('{:<15} {:<20}'.format(token.tokentype, token.symbol))
 
+def astMaker(parsedmap):
+    
 
 def main(argv):
     #todo: read multiple files
@@ -77,10 +94,12 @@ def main(argv):
     f.close()
     tokenmap = lexer(all_lines)
     print(f"Token Map: {tokenmap}")
+
     parsedmap = parser(tokenmap)
-    
     print(f"Parsed List: ")
     printParsed(parsedmap)
+
+    astMaker(parsedmap)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
