@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Tuple
 import lexer, Token, copy
 
 
-def check_location(tokenlist : List[str]) -> bool, List[Token.Token]:
+def check_location(tokenlist : List[str]) -> Tuple[bool, List[Token.Token]]:
     """Checks if the given construction is of the type 'location'. If it is, the first value will return True and the second value will return a list of tokens. 
     If it isn't of the type 'location', the first value will return False and the second value wil return None.
 
@@ -17,8 +17,8 @@ def check_location(tokenlist : List[str]) -> bool, List[Token.Token]:
     # return True, (Token('a', 'b'), Token('b','c')
     return True, [Token.Token('LOCATION', 'location'), Token.Token('NAME', tokenlist.next())] 
     
-def check_goto(tokenlist : List[str]) -> bool, List[Token.Token]:
-     """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
+def check_goto(tokenlist : List[str]) -> Tuple[bool, List[Token.Token]]:
+    """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
     If it isn't of the type 'goto', the first value will return False and the second value wil return None.
 
     Args:

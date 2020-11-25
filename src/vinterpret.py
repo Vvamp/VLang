@@ -38,7 +38,7 @@ def main(argv):
     ast = ast_parser.parse(parsedmap)
 
     # Run the interpreter
-    print(list(interpret(ast)))
+    interpreted = list(interpret(ast))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
