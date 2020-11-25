@@ -21,19 +21,14 @@ def interpret(ast):
 
     
 
-def check_errors(tokenmap, tokenlist = [], errorlist = [], linenr=1):
-    # calc real linenr 
-    #todo: is this allowed? idk but in the future I want this to do in the token object, so it still works after a goto.. 
-    thelinenr = int((linenr+1)/2)  # Because for each line above 1, the function gets called twice. Once to call the [1:] and then to seperate it with [0]
-        
-
+def check_errors(tokenmap, tokenlist = [], errorlist = []):
     if len(tokenmap) == 1:
         if tokenmap[0].tokentype == "ERROR":
-            return (tokenlist, errorlist + [tokenmap[0].symbol + " at line {}".format(thelinenr)])
+            return (tokenlist, errorlist + ["Ln {}: {}".format(tokenmap[0].line, tokenmap[0].symbol)])
         else: 
             return (tokenlist + [tokenmap[0].symbol], errorlist) 
-    current_token_tokenlist, current_token_errorlist = check_errors([tokenmap[0]], tokenlist, errorlist, linenr)
-    next_tokens_tokenlist, next_tokens_errorlist = check_errors(tokenmap[1:], tokenlist, errorlist, linenr+1)
+    current_token_tokenlist, current_token_errorlist = check_errors([tokenmap[0]], tokenlist, errorlist)
+    next_tokens_tokenlist, next_tokens_errorlist = check_errors(tokenmap[1:], tokenlist, errorlist)
     return (current_token_tokenlist + next_tokens_tokenlist, current_token_errorlist + next_tokens_errorlist)
 
 

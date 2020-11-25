@@ -2,7 +2,7 @@ from typing import List, Tuple
 import lexer, Token, copy
 
 
-def check_location(tokenlist : List[str]) -> Tuple[bool, List[Token.Token]]:
+def check_location(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
     """Checks if the given construction is of the type 'location'. If it is, the first value will return True and the second value will return a list of tokens. 
     If it isn't of the type 'location', the first value will return False and the second value wil return None.
 
@@ -14,10 +14,10 @@ def check_location(tokenlist : List[str]) -> Tuple[bool, List[Token.Token]]:
     """
     if tokenlist.next() != 'location':
         return False, None 
-    # return True, (Token('a', 'b'), Token('b','c')
-    return True, [Token.Token('LOCATION', 'location'), Token.Token('NAME', tokenlist.next())] 
+
+    return True, [Token.Token('LOCATION', 'location', current_line), Token.Token('NAME', tokenlist.next(), current_line)] 
     
-def check_goto(tokenlist : List[str]) -> Tuple[bool, List[Token.Token]]:
+def check_goto(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
     """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
     If it isn't of the type 'goto', the first value will return False and the second value wil return None.
 
@@ -29,12 +29,12 @@ def check_goto(tokenlist : List[str]) -> Tuple[bool, List[Token.Token]]:
     """
     if tokenlist.next() != 'goto':
         return False, None 
-    # return True, (Token.Token('a', 'b'), Token.Token('b','c')
-    return True, [Token.Token('GOTO', 'goto'), Token.Token('NAME', tokenlist.next())]
+
+    return True, [Token.Token('GOTO', 'goto', current_line), Token.Token('NAME', tokenlist.next(), current_line)]
     
 
 
-def parse_tokens(tokenlist : List[str]) -> List[Token.Token]:
+def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]:
     """Creates tokens based on an instruction and their parameters
 
     Args:
@@ -45,22 +45,30 @@ def parse_tokens(tokenlist : List[str]) -> List[Token.Token]:
     thetokenlist = Token.TokenList(tokenlist)
 
     # Check if the current instruction is a location statement
-    result,checktokens = check_location(copy.deepcopy(thetokenlist))
+    result,checktokens = check_location(copy.deepcopy(thetokenlist), current_line)
     if result:
         return checktokens
 
     # Check if the current instruction is a goto statement
-    result,checktokens = check_goto(copy.deepcopy(thetokenlist))
+    result,checktokens = check_goto(copy.deepcopy(thetokenlist), current_line)
     if result:
         return checktokens
 
     # If the current instruction doesn't exist, return a NoneType
     # todo: result in check function becomes an int: 1 is true, 0 is false 2 is error
-    return [Token.Token('ERROR', "Error: unknown instruction '{}'".format(thetokenlist.next()))]
+    return [Token.Token('ERROR', "Error: unknown instruction '{}'".format(copy.deepcopy(thetokenlist).next()), current_line)]
 
 
+def parse_with_lines(tokenmap, current_line=1):
+    # print(tokenmap)
+    if len(tokenmap) == 1:
+        return parse_tokens(tokenmap[0], current_line)
+    
+    return parse_with_lines([tokenmap[0]], current_line) + parse_with_lines(tokenmap[1:], current_line+1)
+    
 
-def parse(tokenmap : List[str]) -> List[Token.Token]:
+
+def parse(tokenmap : List[List[str]]) -> List[Token.Token]:
     """Generates a list of tokens from a tokenized list of instructions
 
     Args:
@@ -70,7 +78,7 @@ def parse(tokenmap : List[str]) -> List[Token.Token]:
         [type]: A list of tokens
     """
    
-    return lexer.flatten(list(map(parse_tokens, tokenmap)))
+    return parse_with_lines(tokenmap)
 
 
 # Debug Function, will not be used in final product
