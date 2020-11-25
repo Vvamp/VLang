@@ -8,6 +8,7 @@ class Token:
         Args:
             tokentype (str): The type of the token(NAME, ASSIGNMENT, etc )
             symbol (str): The content of the token('x', 'y', 'i', etc)
+            linenr (int): The line number of the instruction
         """
         self.tokentype = tokentype 
         self.symbol = symbol 

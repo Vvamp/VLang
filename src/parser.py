@@ -59,7 +59,7 @@ def parse_tokens(tokenlist : List[str]) -> List[Token.Token]:
     return [Token.Token('ERROR', "Error: unknown instruction '{}'".format(thetokenlist.next()))]
 
 
-       
+
 def parse(tokenmap : List[str]) -> List[Token.Token]:
     """Generates a list of tokens from a tokenized list of instructions
 
@@ -70,7 +70,7 @@ def parse(tokenmap : List[str]) -> List[Token.Token]:
         [type]: A list of tokens
     """
    
-    return lexer.flatten(list(map(parse_tokens, tokenmap)) )
+    return lexer.flatten(list(map(parse_tokens, tokenmap)))
 
 
 # Debug Function, will not be used in final product

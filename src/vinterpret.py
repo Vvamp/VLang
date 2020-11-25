@@ -1,6 +1,7 @@
 import sys, getopt 
 import functools
 import parser, lexer, ast_parser
+import copy
 from ast_nodes import Node, LocationNode, GotoNode
 
 def interpret_node(ast_node):
@@ -20,14 +21,20 @@ def interpret(ast):
 
     
 
-def check_errors(tokenmap, tokenlist = [], errorlist = []):
+def check_errors(tokenmap, tokenlist = [], errorlist = [], linenr=1):
+    # calc real linenr 
+    #todo: is this allowed? idk but in the future I want this to do in the token object, so it still works after a goto.. 
+    thelinenr = int((linenr+1)/2)  # Because for each line above 1, the function gets called twice. Once to call the [1:] and then to seperate it with [0]
+        
+
     if len(tokenmap) == 1:
         if tokenmap[0].tokentype == "ERROR":
-            return (tokenlist, errorlist + [tokenmap[0].symbol])
+            return (tokenlist, errorlist + [tokenmap[0].symbol + " at line {}".format(thelinenr)])
         else: 
             return (tokenlist + [tokenmap[0].symbol], errorlist) 
-    
-    return ( check_errors([tokenmap[0]], tokenlist, errorlist)[0] + check_errors(tokenmap[1:], tokenlist, errorlist)[0], check_errors([tokenmap[0]], tokenlist, errorlist)[1] + check_errors(tokenmap[1:], tokenlist, errorlist)[1])
+    current_token_tokenlist, current_token_errorlist = check_errors([tokenmap[0]], tokenlist, errorlist, linenr)
+    next_tokens_tokenlist, next_tokens_errorlist = check_errors(tokenmap[1:], tokenlist, errorlist, linenr+1)
+    return (current_token_tokenlist + next_tokens_tokenlist, current_token_errorlist + next_tokens_errorlist)
 
 
 def main(argv):
