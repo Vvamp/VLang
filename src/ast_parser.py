@@ -1,25 +1,19 @@
 from typing import List
 import lexer, Token
-
-class Node(object):
-    def __init__(self, parent, children):
-        self.parent = parent 
-        self.children = children 
-    
-
-
-class LocationNode(Node):
-    def __init__(self, parent : Node, rhs : str):
-        self.node = Node(parent, [rhs])
-
-class GotoNode(Node):
-    def __init__(self, parent : Node, rhs : str):
-        self.node = Node(parent, [rhs])
+from ast_nodes import LocationNode, GotoNode, Node
 
 
 
+def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]:
+    """[summary]
 
-def createAST(parsed_partmap, rootNode):
+    Args:
+        parsed_partmap (List[Token.Token]): A (subset of) a list of tokens
+        rootNode (Node): The root of the tree, which is usually a regular empty node
+
+    Returns:
+        List[Node]: A list of AST nodes
+    """
     if len(parsed_partmap) == 0:
         return []
 
@@ -36,9 +30,16 @@ def createAST(parsed_partmap, rootNode):
     return [thisNode] + createAST(parsed_partmap[indexesUsed:], rootNode)
 
 
-def parse(parsedmap : List[Token.Token]):
-    rootNode = Node(None, [])
-    return createAST(parsedmap, rootNode)
+def parse(parsedmap : List[Token.Token]) -> List[Node]:
+    """Creates an AST tree based on a list of tokens
+
+    Args:
+        parsedmap (List[Token.Token]): A list of tokens
+
+    Returns:
+        List[Node]: A list of AST Nodes
+    """
+    return createAST(parsedmap, Node(None))
     
 
         
