@@ -18,6 +18,17 @@ def interpret_node(ast_node):
 def interpret(ast):
     return map(interpret_node, ast)     
 
+    
+
+def check_errors(tokenmap, tokenlist = [], errorlist = []):
+    if len(tokenmap) == 1:
+        if tokenmap[0].tokentype == "ERROR":
+            return (tokenlist, errorlist + [tokenmap[0].symbol])
+        else: 
+            return (tokenlist + [tokenmap[0].symbol], errorlist) 
+    
+    return ( check_errors([tokenmap[0]], tokenlist, errorlist)[0] + check_errors(tokenmap[1:], tokenlist, errorlist)[0], check_errors([tokenmap[0]], tokenlist, errorlist)[1] + check_errors(tokenmap[1:], tokenlist, errorlist)[1])
+
 
 def main(argv):
     #todo: read multiple files
@@ -31,6 +42,12 @@ def main(argv):
 
     # Parse the tokenized list 
     parsedmap = parser.parse(tokenmap)
+
+    #Check for errors 
+    tokens,errors = check_errors(parsedmap)
+    if len(errors) >= 1: 
+        return 1, errors
+
     print(f"Parsed List: ")
     parser.printParsed(parsedmap)
 
@@ -40,5 +57,11 @@ def main(argv):
     # Run the interpreter
     interpreted = list(interpret(ast))
 
+    return 0, []
+
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    result, errors = main(sys.argv[1:])
+    print("Program Exit Code: {}".format(result))
+    if result == 1:
+        for error in errors: 
+            print(error)

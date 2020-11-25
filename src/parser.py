@@ -55,8 +55,8 @@ def parse_tokens(tokenlist : List[str]) -> List[Token.Token]:
         return checktokens
 
     # If the current instruction doesn't exist, return a NoneType
-    # todo: return an error
-    return [Token.Token('ERROR', 'NoneType')]
+    # todo: result in check function becomes an int: 1 is true, 0 is false 2 is error
+    return [Token.Token('ERROR', "Error: unknown instruction '{}'".format(thetokenlist.next()))]
 
 
        
