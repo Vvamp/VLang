@@ -2,7 +2,7 @@ import sys, getopt
 import functools
 import parser, lexer, ast_parser
 import copy
-from ast_nodes import Node, LocationNode, GotoNode, WriteNode, WriteLnNode
+from ast_nodes import Node, LocationNode, GotoNode, WriteNode, WriteLnNode, AssignmentNode
 import memory
 
 def interpret_node(ast_node, mem):
@@ -18,16 +18,22 @@ def interpret_node(ast_node, mem):
         return mem.push(NewBlock)
 
     elif type(ast_node) is WriteNode:
-        NewBlock = memory.WriteMemoryBlock("", ast_node.rhs, False)
+        NewBlock = memory.WriteMemoryBlock("", ast_node.rhs, False, ast_node.isVariable, copy.deepcopy(mem))
         print("Write: {}".format(ast_node.rhs))
 
         return mem.push(NewBlock)
 
     elif type(ast_node) is WriteLnNode:
-            NewBlock = memory.WriteMemoryBlock("", ast_node.rhs, True)
-            print("WriteLn: {}".format(ast_node.rhs))
+        NewBlock = memory.WriteMemoryBlock("", ast_node.rhs, True, ast_node.isVariable, copy.deepcopy(mem))
+        print("WriteLn: {}".format(ast_node.rhs))
 
-            return mem.push(NewBlock)
+        return mem.push(NewBlock)
+
+    elif type(ast_node) is AssignmentNode:
+        NewBlock = memory.AssignmentMemoryBlock("", ast_node.lhs, ast_node.rhs, ast_node.asstype)
+        print("Assignment: {} {} = {}".format(ast_node.asstype, ast_node.lhs, ast_node.rhs))
+
+        return mem.push(NewBlock)
     else:
         print("Error > Invalid node!")
     return

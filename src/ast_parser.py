@@ -1,6 +1,6 @@
 from typing import List
 import lexer, Token
-from ast_nodes import LocationNode, GotoNode, Node, WriteNode, WriteLnNode
+from ast_nodes import LocationNode, GotoNode, Node, WriteNode, WriteLnNode, AssignmentNode
 
 def findIndexByType(thelist, thetype):
     print("Searching list: {}".format(thelist))
@@ -33,35 +33,59 @@ def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]
         thisNode = GotoNode(rootNode, parsed_partmap[1].symbol)
     elif parsed_partmap[0].tokentype == "IO" and parsed_partmap[0].symbol == "write":
         indexesUsed = 0 
-        # [write, delim, hallo, caro, delim]
-        if parsed_partmap[1].tokentype != "DELIM":
+
+        if parsed_partmap[1].tokentype != "DELIM" and parsed_partmap[1].tokentype != "IDENTIFIER":
             # Errror 
             return 
-        otherdelimIndex = findIndexByType(parsed_partmap[2:], "DELIM") +2
-        indexesUsed = otherdelimIndex+1 # The call + first delim + the rest
+        if parsed_partmap[1].tokentype == "DELIM":
+            otherdelimIndex = findIndexByType(parsed_partmap[2:], "DELIM") +2
+            indexesUsed = otherdelimIndex+1 # The call + first delim + the rest
+            beginIndex = 2
+            isVariable = False
+        else: 
+            otherdelimIndex = 1+1
+            beginIndex = 1
+            indexesUsed = 2
+            isVariable = True
 
         valNodes = []
-        for node in parsed_partmap[2:otherdelimIndex]:
+        for node in parsed_partmap[beginIndex:otherdelimIndex]:
             valNodes.append(node.symbol)
+    
         
-        thisNode = WriteNode(rootNode, valNodes)
+        thisNode = WriteNode(rootNode, valNodes, isVariable)
     
     elif parsed_partmap[0].tokentype == "IO" and parsed_partmap[0].symbol == "writeline":
         indexesUsed = 0 
-        # [write, delim, hallo, caro, delim]
-        if parsed_partmap[1].tokentype != "DELIM":
+
+        if parsed_partmap[1].tokentype != "DELIM" and parsed_partmap[1].tokentype != "IDENTIFIER":
             # Errror 
             return 
-        otherdelimIndex = findIndexByType(parsed_partmap[2:], "DELIM") +2
-        indexesUsed = otherdelimIndex+1 # The call + first delim + the rest
+
+        if parsed_partmap[1].tokentype == "DELIM":
+            otherdelimIndex = findIndexByType(parsed_partmap[2:], "DELIM") +2
+            indexesUsed = otherdelimIndex+1 # The call + first delim + the rest
+            beginIndex = 2
+            isVariable = False
+        else: 
+            otherdelimIndex = 1+1
+            beginIndex = 1
+            indexesUsed = 2
+            isVariable = True
 
         valNodes = []
-        for node in parsed_partmap[2:otherdelimIndex]:
+        for node in parsed_partmap[beginIndex:otherdelimIndex]:
             valNodes.append(node.symbol)
-        
-        thisNode = WriteLnNode(rootNode, valNodes)
+    
+            
+        thisNode = WriteLnNode(rootNode, valNodes, isVariable)
+
+    elif parsed_partmap[0].tokentype == "TYPE":
+        indexesUsed = 4 # Change for str 
+        thisNode = AssignmentNode(rootNode, parsed_partmap[1].symbol, parsed_partmap[3].symbol,parsed_partmap[0].symbol)
 
         # Next one is also part of the AST node 
+
     return [thisNode] + createAST(parsed_partmap[indexesUsed:], rootNode)
 
 
