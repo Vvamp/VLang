@@ -1,2 +1,5 @@
-location go_to_me
-goto go_to_me
+location loop
+write "Hello World!"
+location hallo2
+write "Hello 2"
+goto hallo2

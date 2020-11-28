@@ -1,8 +1,14 @@
 from typing import List
 import lexer, Token
-from ast_nodes import LocationNode, GotoNode, Node
+from ast_nodes import LocationNode, GotoNode, Node, WriteNode
 
-
+def findIndexByType(thelist, thetype):
+    print("Searching list: {}".format(thelist))
+    #todo functional
+    for elem in thelist:
+        if elem.tokentype == thetype:
+            return  thelist.index(elem)
+    return False
 
 def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]:
     """[summary]
@@ -25,6 +31,20 @@ def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]
     elif parsed_partmap[0].tokentype == "GOTO":
         indexesUsed=2
         thisNode = GotoNode(rootNode, parsed_partmap[1].symbol)
+    elif parsed_partmap[0].tokentype == "IO":
+        indexesUsed = 0 
+        # [write, delim, hallo, caro, delim]
+        if parsed_partmap[1].tokentype != "DELIM":
+            # Errror 
+            return 
+        otherdelimIndex = findIndexByType(parsed_partmap[2:], "DELIM") +2
+        indexesUsed = otherdelimIndex+1 # The call + first delim + the rest
+
+        valNodes = []
+        for node in parsed_partmap[2:otherdelimIndex]:
+            valNodes.append(node.symbol)
+        
+        thisNode = WriteNode(rootNode, valNodes)
 
         # Next one is also part of the AST node 
     return [thisNode] + createAST(parsed_partmap[indexesUsed:], rootNode)

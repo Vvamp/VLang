@@ -2,22 +2,43 @@ import sys, getopt
 import functools
 import parser, lexer, ast_parser
 import copy
-from ast_nodes import Node, LocationNode, GotoNode
+from ast_nodes import Node, LocationNode, GotoNode, WriteNode
+import memory
 
-def interpret_node(ast_node):
+def interpret_node(ast_node, mem):
+    print("Interpreting Node: {}".format(ast_node))
     if type(ast_node) is LocationNode:
+        NewBlock = memory.LocationMemoryBlock(ast_node.rhs)
         print("Location: {}".format(ast_node.rhs))
-        # Set a label at specific pc 
+        return mem.push(NewBlock)
+
     elif type(ast_node) is GotoNode:
+        NewBlock = memory.GotoMemoryBlock("", ast_node.rhs, copy.deepcopy(mem))
         print("Goto: {}".format(ast_node.rhs))
-        # Search for the label and go to it
+        return mem.push(NewBlock)
+        
+    elif type(ast_node) is WriteNode:
+        NewBlock = memory.WriteMemoryBlock("", ast_node.rhs)
+        print("Write: {}".format(ast_node.rhs))
+
+        return mem.push(NewBlock)
+
     else:
         print("Error > Invalid node!")
     return
     
 
 def interpret(ast):
-    return map(interpret_node, ast)     
+    print(ast)
+    mem = memory.Memory()
+
+    # a = map(interpret_node, mem, ast)  
+    a = mem   
+    #todo no for loops
+    for node in ast:
+        a = interpret_node(node, a)
+    # print('returning {}'.format(a))
+    return a
 
     
 
@@ -57,7 +78,10 @@ def main(argv):
     ast = ast_parser.parse(parsedmap)
 
     # Run the interpreter
-    interpreted = list(interpret(ast))
+    interpreted = interpret(ast)
+    while interpreted != None:
+        interpreted = interpreted.run()
+    # print(interpreted)
 
     return 0, []
 

@@ -32,7 +32,39 @@ def check_goto(tokenlist : List[str], current_line : int) -> Tuple[bool, List[To
 
     return True, [Token.Token('GOTO', 'goto', current_line), Token.Token('NAME', tokenlist.next(), current_line)]
     
+def check_write(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+    """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'goto', the first value will return False and the second value wil return None.
 
+    Args:
+        tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
+
+    Returns:
+        bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+    """
+    if tokenlist.next() != 'write':
+        return False, None 
+
+    if tokenlist.next() != '"':
+        return False, None 
+    
+    text = []
+    a = ""
+    while a != '"':
+        a = tokenlist.next()
+        if a != '"':
+            text.append(a) 
+    allTokens = [] 
+    #todo: functional
+    allTokens.append(Token.Token('IO', 'write', current_line))
+    allTokens.append(Token.Token('DELIM', '"', current_line))
+    for textToken in text:
+        allTokens.append(Token.Token('VALUE', textToken, current_line))
+    allTokens.append(Token.Token('DELIM', '"', current_line))
+
+
+    return True, allTokens
+    
 
 def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]:
     """Creates tokens based on an instruction and their parameters
@@ -52,6 +84,10 @@ def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]
     # Check if the current instruction is a goto statement
     result,checktokens = check_goto(copy.deepcopy(thetokenlist), current_line)
     if result:
+        return checktokens
+    
+    result,checktokens = check_write(copy.deepcopy(thetokenlist), current_line)
+    if result: 
         return checktokens
 
     # If the current instruction doesn't exist, return a NoneType

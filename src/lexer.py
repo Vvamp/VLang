@@ -1,5 +1,6 @@
 from typing import List
 import Token
+import re
 
  
 def flatten(unflattened_list : List[List[Token.Token]]) -> List[Token.Token]:
@@ -17,6 +18,12 @@ def flatten(unflattened_list : List[List[Token.Token]]) -> List[Token.Token]:
 
     return head + flatten(tail)
 
+
+def fixmylex(line):
+    a = re.split('\s|(\")', line)
+    a = filter(None, a) 
+    return list( a )
+
 def lex(lines : List[str]) -> List[str] : 
     """Generates a tokenized list of instructions from a valid .v file
 
@@ -26,6 +33,12 @@ def lex(lines : List[str]) -> List[str] :
     Returns:
         List[str]: A tokenized list of instructions in the .v file
     """
-    return list( map(lambda line: (line.strip('\n').split(' ')), lines ))
+    # b = re.split('\s | \"', line)
+    # a = list( map(lambda  line: re.split('\s|(\")', line), lines) )
+    a = list( map(fixmylex, lines) )
+    # b = list( filter(lambda word: word != '' and word != None, a) )
+    # a = list( map(lambda line: (line.strip('\n').split(' ').split("\"")), lines ))
+    print(a)
+    return a
 
 
