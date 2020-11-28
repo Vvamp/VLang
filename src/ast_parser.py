@@ -1,6 +1,6 @@
 from typing import List
 import lexer, Token
-from ast_nodes import LocationNode, GotoNode, Node, WriteNode
+from ast_nodes import LocationNode, GotoNode, Node, WriteNode, WriteLnNode
 
 def findIndexByType(thelist, thetype):
     print("Searching list: {}".format(thelist))
@@ -31,7 +31,7 @@ def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]
     elif parsed_partmap[0].tokentype == "GOTO":
         indexesUsed=2
         thisNode = GotoNode(rootNode, parsed_partmap[1].symbol)
-    elif parsed_partmap[0].tokentype == "IO":
+    elif parsed_partmap[0].tokentype == "IO" and parsed_partmap[0].symbol == "write":
         indexesUsed = 0 
         # [write, delim, hallo, caro, delim]
         if parsed_partmap[1].tokentype != "DELIM":
@@ -45,6 +45,21 @@ def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]
             valNodes.append(node.symbol)
         
         thisNode = WriteNode(rootNode, valNodes)
+    
+    elif parsed_partmap[0].tokentype == "IO" and parsed_partmap[0].symbol == "writeline":
+        indexesUsed = 0 
+        # [write, delim, hallo, caro, delim]
+        if parsed_partmap[1].tokentype != "DELIM":
+            # Errror 
+            return 
+        otherdelimIndex = findIndexByType(parsed_partmap[2:], "DELIM") +2
+        indexesUsed = otherdelimIndex+1 # The call + first delim + the rest
+
+        valNodes = []
+        for node in parsed_partmap[2:otherdelimIndex]:
+            valNodes.append(node.symbol)
+        
+        thisNode = WriteLnNode(rootNode, valNodes)
 
         # Next one is also part of the AST node 
     return [thisNode] + createAST(parsed_partmap[indexesUsed:], rootNode)

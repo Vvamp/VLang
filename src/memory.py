@@ -11,13 +11,6 @@ class Memory():
     def push(self, item):
         return Memory(self.items + [item])
 
-
-
-    # def push(self, type="", flabel=""):     
-    #     newBlock = MemoryBlock(len(self.items)-1, label)
-
-    #     return Memory(self.items + [newBlock])
-    
     def pop(self):
         """Returns the item at the top of memory and return the remaining memory
 
@@ -48,14 +41,16 @@ class LocationMemoryBlock(MemoryBlock):
         return pc+1
 
 class WriteMemoryBlock(MemoryBlock):
-    def __init__(self, label : str, rhs : List[str]):
+    def __init__(self, label : str, rhs : List[str],  writeLine : bool):
         MemoryBlock.__init__(self, label)
         self.rhs = rhs
+        self.writeLine = writeLine
 
     def run(self, pc : int):
         for word in self.rhs:
             print(word, end=" ")
-        print("\n", end="")
+        if self.writeLine:
+            print("\n", end="")
         return pc+1
 
 class GotoMemoryBlock(MemoryBlock):

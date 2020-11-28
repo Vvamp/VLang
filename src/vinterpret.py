@@ -2,7 +2,7 @@ import sys, getopt
 import functools
 import parser, lexer, ast_parser
 import copy
-from ast_nodes import Node, LocationNode, GotoNode, WriteNode
+from ast_nodes import Node, LocationNode, GotoNode, WriteNode, WriteLnNode
 import memory
 
 def interpret_node(ast_node, mem):
@@ -16,13 +16,18 @@ def interpret_node(ast_node, mem):
         NewBlock = memory.GotoMemoryBlock("", ast_node.rhs, copy.deepcopy(mem))
         print("Goto: {}".format(ast_node.rhs))
         return mem.push(NewBlock)
-        
+
     elif type(ast_node) is WriteNode:
-        NewBlock = memory.WriteMemoryBlock("", ast_node.rhs)
+        NewBlock = memory.WriteMemoryBlock("", ast_node.rhs, False)
         print("Write: {}".format(ast_node.rhs))
 
         return mem.push(NewBlock)
 
+    elif type(ast_node) is WriteLnNode:
+            NewBlock = memory.WriteMemoryBlock("", ast_node.rhs, True)
+            print("WriteLn: {}".format(ast_node.rhs))
+
+            return mem.push(NewBlock)
     else:
         print("Error > Invalid node!")
     return

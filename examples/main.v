@@ -1,5 +1,4 @@
 location loop
-write "Hello World!"
-location hallo2
-write "Hello 2"
-goto hallo2
+write "Hello"
+writeLine " World!"
+goto loop
