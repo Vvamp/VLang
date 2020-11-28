@@ -36,3 +36,16 @@ class AssignmentNode(Node):
         self.lhs = lhs 
         self.rhs = rhs
         self.asstype = asstype
+
+class IfNode(Node):
+    def __init__(self, parent : Node, lhs, rhs, compare_operator : str):
+        self.node = Node(parent)
+        self.parent = self.node.parent 
+        self.lhs = lhs 
+        self.rhs = rhs 
+        self.compare_operator = compare_operator
+
+class ExitNode(Node):
+    def __init__(self, parent : Node):
+        self.node = Node(parent)
+        self.parent = self.node.parent

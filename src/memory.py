@@ -1,5 +1,5 @@
 from typing import List 
-
+import sys 
 class Memory():
     def __init__(self, items=[], pc=0):
         self.pc = pc
@@ -40,6 +40,19 @@ class LocationMemoryBlock(MemoryBlock):
     def run(self, pc : int):
         return pc+1
 
+def findVar(memory, name):
+    oldvar = name
+    for memblock in memory.items:
+         if type(memblock) == AssignmentMemoryBlock:
+                if str(memblock.lhs) == str(name):
+                    name = memblock.rhs
+                    return name 
+    if oldvar == name:
+        print("Error: var not found")
+        print(1/0)
+        return name
+    
+
 class WriteMemoryBlock(MemoryBlock):
     def __init__(self, label : str, rhs : List[str],  writeLine : bool, isVariable = False, memory = None):
         MemoryBlock.__init__(self, label)
@@ -50,19 +63,8 @@ class WriteMemoryBlock(MemoryBlock):
 
     def run(self, pc : int):
         if self.isVariable:
-            oldvar = self.rhs 
             # Find variable in memory and grab value
-            for memblock in self.memory.items:
-                if type(memblock) == AssignmentMemoryBlock:
-                    if str(memblock.lhs) == str(self.rhs[0]):
-                        self.rhs[0] = memblock.rhs
-                        break
-            if str(self.rhs[0]) == str(oldvar):
-                # Error 
-                print("Error: variable not found")
-                print(self.memory.items)
-                print(1/0)
-                return pc + 1
+            findVar(self.memory, self.rhs[0])
 
         for word in self.rhs:
             print(word, end="")
@@ -92,3 +94,23 @@ class AssignmentMemoryBlock(MemoryBlock):
 
     def run(self, pc : int):
         return pc + 1
+
+class IfMemoryBlock(MemoryBlock):
+    def __init__(self, label : str, lhs, rhs, compare_operator, memory):
+        MemoryBlock.__init__(self, label)
+        self.lhs = lhs 
+        self.rhs = rhs 
+        self.compare_operator = compare_operator
+        self.memory = memory 
+
+    def run(self, pc : int):
+        if self.compare_operator == '==':
+            if findVar(self.memory, self.lhs) == findVar(self.memory, self.rhs):
+                print(self.memory.items)
+                return pc + 1
+
+        return pc+2
+
+class ExitMemoryBlock(MemoryBlock):
+    def run(self, pc : int):
+        sys.exit(0)

@@ -1,6 +1,6 @@
 from typing import List
 import lexer, Token
-from ast_nodes import LocationNode, GotoNode, Node, WriteNode, WriteLnNode, AssignmentNode
+from ast_nodes import LocationNode, GotoNode, Node, WriteNode, WriteLnNode, AssignmentNode, IfNode, ExitNode
 
 def findIndexByType(thelist, thetype):
     print("Searching list: {}".format(thelist))
@@ -83,6 +83,14 @@ def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]
     elif parsed_partmap[0].tokentype == "TYPE":
         indexesUsed = 4 # Change for str 
         thisNode = AssignmentNode(rootNode, parsed_partmap[1].symbol, parsed_partmap[3].symbol,parsed_partmap[0].symbol)
+
+    elif parsed_partmap[0].tokentype == "EXIT":
+        indexesUsed = 1 # Change for str 
+        thisNode = ExitNode(rootNode)
+
+    elif parsed_partmap[0].tokentype == "CONDITIONAL":
+        indexesUsed = 4
+        thisNode = IfNode(rootNode, parsed_partmap[1].symbol, parsed_partmap[3].symbol, parsed_partmap[2].symbol)
 
         # Next one is also part of the AST node 
 
