@@ -49,18 +49,19 @@ def interpret_node(ast_node, mem):
     return
     
 
+def interpret_rec(ast, mem):
+    if len(ast) == 1:
+        return interpret_node(ast[0], mem)
+    elif len(ast) == 2:
+        return interpret_node(ast[1], interpret_node(ast[0], mem))
+
+    a = interpret_rec(ast[0:2], mem)
+    return interpret_rec(ast[2:], a)
+
 def interpret(ast):
     print(ast)
     mem = memory.Memory()
-
-    # a = map(interpret_node, mem, ast)  
-    a = mem   
-
-    #todo no for loops
-    for node in ast:
-        a = interpret_node(node, a)
-    # print('returning {}'.format(a))
-    return a
+    return interpret_rec(ast, mem)
 
     
 
