@@ -14,7 +14,7 @@ def check_location(tokenlist : List[str], current_line : int) -> Tuple[bool, Lis
     """
     nextToken,tokenlist = tokenlist.next()
     if nextToken != 'location':
-        return False, None 
+        return False, [Token.Token('ERROR', "Token is not of type 'location'", current_line)] 
 
     nameToken,tokenlist = tokenlist.next()
     return True, [Token.Token('LOCATION', 'location', current_line), Token.Token('NAME', nameToken.next(), current_line)] 
@@ -32,7 +32,7 @@ def check_goto(tokenlist : List[str], current_line : int) -> Tuple[bool, List[To
     nextToken,tokenlist = tokenlist.next()
 
     if nextToken != 'goto':
-        return False, None 
+        return False, [Token.Token('ERROR', "Token is not of type 'goto'", current_line)] 
 
     nameToken,tokenlist = tokenlist.next()
 
@@ -52,7 +52,7 @@ def check_write(tokenlist : List[str], current_line : int) -> Tuple[bool, List[T
     nextToken,tokenlist = tokenlist.next()
 
     if nextToken != 'write':
-        return False, None 
+        return False, [Token.Token('ERROR', "Token is not of type 'write'", current_line)] 
 
     allTokens = [] 
     nextToken,tokenlist = tokenlist.next()
@@ -79,13 +79,13 @@ def check_write(tokenlist : List[str], current_line : int) -> Tuple[bool, List[T
 def check_emptyline(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
     nextToken,tokenlist = tokenlist.next()
     if nextToken != "\n":
-        return False, None 
+        return False, [Token.Token('ERROR', "Token is not of type 'empty line'", current_line)] 
     return True, [Token.Token('IGNORE', 'newline', current_line)]
 
 def check_commentline(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
     nextToken,tokenlist = tokenlist.next()
     if nextToken != "#":
-        return False, None 
+        return False, [Token.Token('ERROR', "Token is not of type 'comment'", current_line)] 
     return True, [Token.Token('IGNORE', 'commentline', current_line)]
 
 
@@ -102,7 +102,7 @@ def check_writeln(tokenlist : List[str], current_line : int) -> Tuple[bool, List
     nextToken,tokenlist = tokenlist.next()
 
     if nextToken != 'writeLine':
-        return False, None 
+        return False, [Token.Token('ERROR', "Token is not of type 'writeLine'", current_line)] 
 
     allTokens = [] 
     nextToken,tokenlist = tokenlist.next()
@@ -141,13 +141,13 @@ def check_if(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Toke
     nextToken,tokenlist = tokenlist.next()
 
     if nextToken != 'if':
-        return False, None 
+        return False, [Token.Token('ERROR', "Token is not of type 'if'", current_line)] 
 
     var1,tokenlist = tokenlist.next()
 
     compare_operator,tokenlist = tokenlist.next()
     if compare_operator not in compare_operators:
-        return False, None
+        return True, [Token.Token('ERROR', "Unknown compare operator", current_line)] 
 
     var2,tokenlist = tokenlist.next()
     alltokens = [Token.Token("CONDITIONAL", "if", current_line), Token.Token("IDENTIFIER", var1, current_line), Token.Token("COMPARE", compare_operator, current_line), Token.Token("IDENTIFIER", var2, current_line)]
@@ -166,7 +166,7 @@ def check_exit(tokenlist : List[str], current_line : int) -> Tuple[bool, List[To
     nextToken,tokenlist = tokenlist.next()
 
     if nextToken != 'exit':
-        return False, None 
+        return False, [Token.Token('ERROR', "Token is not of type 'exit'", current_line)] 
 
 
     alltokens = [Token.Token("EXIT", "exit", current_line)]
@@ -190,25 +190,21 @@ def check_assignment(tokenlist : List[str], current_line : int) -> Tuple[bool, L
     assignment_operators = ['=']
     variable_keyword,tokenlist = tokenlist.next()
     if variable_keyword not in variable_keywords:
-        return False, None 
+        return False, [Token.Token('ERROR', "Token is not of type 'location'", current_line)] 
 
     name,tokenlist = tokenlist.next()
     assignment_operator,tokenlist = tokenlist.next()
     if assignment_operator not in assignment_operators:
-        return False, None 
+        return True, [Token.Token('ERROR', "Unknown assignment operator", current_line)] 
 
     value,tokenlist = tokenlist.next()
 
     if type(eval(value)) != variable_keywords[variable_keyword]:
-        return False, [Token.Token('ERROR', 'Error: Value does not match type', current_line)]
+        return True, [Token.Token('ERROR', 'Error: Value does not match type', current_line)]
 
     tokens = [Token.Token('TYPE', variable_keyword, current_line), Token.Token('IDENTIFIER', name, current_line), 
             Token.Token('ASSIGNMENT', assignment_operator, current_line), Token.Token('VALUE', value, current_line)]
-    # tokens.append(Token.Token('TYPE', variable_keyword, current_line))
-    # tokens.append(Token.Token('IDENTIFIER', name, current_line))
-    # tokens.append(Token.Token('ASSIGNMENT', assignment_operator, current_line))
-    # tokens.append(Token.Token('VALUE', value, current_line))
-
+   
     return True, tokens
 
 def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]:
@@ -216,6 +212,7 @@ def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]
 
     Args:
         tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
+        current_line (int): The line the current token is placed in
     Returns:
         List[Token.Token]: A list of tokens based on the instruction with the parameter
     """
@@ -268,7 +265,16 @@ def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]
     return [Token.Token('ERROR', "Error: unknown instruction '{}'".format(copy.deepcopy(thetokenlist).next()), current_line)]
 
 
-def parse_with_lines(tokenmap, current_line=1):
+def parse_with_lines(tokenmap : List(str), current_line : int=1) -> List(Token.Token):
+    """Recursively parses the tokenmap and passes the current line to it
+
+    Args:
+        tokenmap (List(str)): The list of lexed tokens to parse
+        current_line (int, optional): The current line that is being parsed Defaults to 1.
+
+    Returns:
+        List(Token.Token): A list of parsed tokens
+    """
     # print(tokenmap)
     if len(tokenmap) == 1:
         return parse_tokens(tokenmap[0], current_line)
@@ -284,15 +290,15 @@ def parse(tokenmap : List[List[str]]) -> List[Token.Token]:
         tokenmap (List[str]): A tokenized list of instructions
 
     Returns:
-        [type]: A list of tokens
+        List(Token.Token): A list of tokens
     """
    
     return parse_with_lines(tokenmap)
 
 
 # Debug Function, will not be used in final product
-def printParsed(parsedmap):
-    print(parsedmap)
-    print('{:<15} {:<20}'.format("[Type]", "[Symbol]"))
-    for token in parsedmap:
-            print('{:<15} {:<20}'.format(token.tokentype, token.symbol))
+# def printParsed(parsedmap):
+#     print(parsedmap)
+#     print('{:<15} {:<20}'.format("[Type]", "[Symbol]"))
+#     for token in parsedmap:
+#             print('{:<15} {:<20}'.format(token.tokentype, token.symbol))

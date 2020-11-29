@@ -19,14 +19,22 @@ def flatten(unflattened_list : List[List[Token.Token]]) -> List[Token.Token]:
     return head + flatten(tail)
 
 
-def lexLine(line):
+def lexLine(line : str) -> List(str):
+    """Tokenizes a code line
+
+    Args:
+        line (str): A line of VLang code
+
+    Returns:
+        List(str): A list of tokenized strings
+    """
     if line == "\n":
         return ["\n"]
     elif line.startswith('#'):
         return ["#"]
     
-    splittedList = re.split('\s|(\")', line)
-    filteredList = filter(None, splittedList) 
+    splittedList = re.split('\s|(\")', line) # Splits the line based on quotes or whitespaces(spaces)
+    filteredList = filter(None, splittedList) # Filters None's out of the list. These ocur due to the regex expression above
     return list( filteredList )
 
 def lex(lines : List[str]) -> List[str] : 
@@ -41,7 +49,7 @@ def lex(lines : List[str]) -> List[str] :
   
     lexed = list( map(lexLine, lines) )
    
-    print(lexed)
+    # print(lexed)
     return lexed
 
 

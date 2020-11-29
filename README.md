@@ -1,6 +1,7 @@
 # VLang
 A statically typed interpreter language for the ATP class
-
+## Requires
+Python >= 3.8
 ## Requirements
 Gekozen taal: VLang(Eigen Taal)
 Turing-compleet omdat:

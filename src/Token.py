@@ -1,3 +1,4 @@
+from typing import List, Tuple
 
 class Token:
     """A Token
@@ -15,15 +16,18 @@ class Token:
         self.line = linenr
 
 class TokenList:
-    def __init__(self, tokenlist):
+    def __init__(self, tokenlist : List(Token)):
+        """Initializes a TokenList object based on a list of tokens
+
+        Args:
+            tokenlist (List(Token)): A list of tokens
+        """
         self.tokenlist = tokenlist 
 
-    def next(self) -> Token: 
-        """Return the first token and remove it
+    def next(self) -> Tuple(Token, TokenList): 
+        """Return the first token and a new TokenList without that token
 
         Returns:
-            Token: The next token in the list
+            Tuple(Token, TokenList): A tuple of the next token in the list and a lsit without the token
         """
-        # theToken = self.tokenlist[0]
-        # self.tokenlist = self.tokenlist[1:] # pop 
         return (self.tokenlist[0], TokenList(self.tokenlist[1:]))
