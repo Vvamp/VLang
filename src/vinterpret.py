@@ -75,6 +75,10 @@ def check_errors(tokenmap, tokenlist = [], errorlist = []):
     next_tokens_tokenlist, next_tokens_errorlist = check_errors(tokenmap[1:], tokenlist, errorlist)
     return (current_token_tokenlist + next_tokens_tokenlist, current_token_errorlist + next_tokens_errorlist)
 
+def run_interpreter(interpreted):
+    if interpreted is None: 
+        return 
+    return run_interpreter(interpreted.run())
 
 def main(argv):
     f = open(argv[0], "r")
@@ -101,10 +105,7 @@ def main(argv):
 
     # Run the interpreter
     interpreted = interpret(ast)
-    
-    #todo no loop: create a recursive function 
-    while interpreted != None:
-        interpreted = interpreted.run()
+    run_interpreter(interpreted)
 
     return 0, []
 
