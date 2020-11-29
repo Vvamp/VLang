@@ -12,10 +12,12 @@ def check_location(tokenlist : List[str], current_line : int) -> Tuple[bool, Lis
     Returns:
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
     """
-    if tokenlist.next() != 'location':
+    nextToken,tokenlist = tokenlist.next()
+    if nextToken != 'location':
         return False, None 
 
-    return True, [Token.Token('LOCATION', 'location', current_line), Token.Token('NAME', tokenlist.next(), current_line)] 
+    nameToken,tokenlist = tokenlist.next()
+    return True, [Token.Token('LOCATION', 'location', current_line), Token.Token('NAME', nameToken.next(), current_line)] 
     
 def check_goto(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
     """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
@@ -27,10 +29,15 @@ def check_goto(tokenlist : List[str], current_line : int) -> Tuple[bool, List[To
     Returns:
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
     """
-    if tokenlist.next() != 'goto':
+    nextToken,tokenlist = tokenlist.next()
+
+    if nextToken != 'goto':
         return False, None 
 
-    return True, [Token.Token('GOTO', 'goto', current_line), Token.Token('NAME', tokenlist.next(), current_line)]
+    nameToken,tokenlist = tokenlist.next()
+
+
+    return True, [Token.Token('GOTO', 'goto', current_line), Token.Token('NAME', nameToken, current_line)]
     
 def check_write(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
     """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
@@ -42,29 +49,30 @@ def check_write(tokenlist : List[str], current_line : int) -> Tuple[bool, List[T
     Returns:
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
     """
-    if tokenlist.next() != 'write':
+    nextToken,tokenlist = tokenlist.next()
+
+    if nextToken != 'write':
         return False, None 
 
     allTokens = [] 
-    nextToken = tokenlist.next()
+    nextToken,tokenlist = tokenlist.next()
     if nextToken == '"':
         # return False, None   
         text = []
         a = ""
         while a != '"':
-            a = tokenlist.next()
+            a,tokenlist = tokenlist.next()
             if a != '"':
                 text.append(a) 
-        #todo: functional
+
+
         allTokens.append(Token.Token('IO', 'write', current_line))
         allTokens.append(Token.Token('DELIM', '"', current_line))
-        for textToken in text:
-            allTokens.append(Token.Token('VALUE', textToken, current_line))
+        newTokens = list( map(lambda textToken: allTokens.append(Token.Token('VALUE', textToken, current_line)), text) )
         allTokens.append(Token.Token('DELIM', '"', current_line))
     else: 
         allTokens.append(Token.Token('IO', 'write', current_line))
         allTokens.append(Token.Token('IDENTIFIER', nextToken, current_line))
-
     return True, allTokens
     
 def check_writeln(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
@@ -77,29 +85,31 @@ def check_writeln(tokenlist : List[str], current_line : int) -> Tuple[bool, List
     Returns:
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
     """
-    if tokenlist.next() != 'writeLine':
+    nextToken,tokenlist = tokenlist.next()
+
+    if nextToken != 'writeLine':
         return False, None 
 
     allTokens = [] 
-    nextToken = tokenlist.next()
+    nextToken,tokenlist = tokenlist.next()
     if nextToken == '"':
         # return False, None   
         text = []
         a = ""
         while a != '"':
-            a = tokenlist.next()
+            a,tokenlist = tokenlist.next()
             if a != '"':
                 text.append(a) 
-        #todo: functional
+
         allTokens.append(Token.Token('IO', 'writeline', current_line))
         allTokens.append(Token.Token('DELIM', '"', current_line))
-        for textToken in text:
-            allTokens.append(Token.Token('VALUE', textToken, current_line))
+        newTokens = list( map(lambda textToken: allTokens.append(Token.Token('VALUE', textToken, current_line)), text) )
+      
+      
         allTokens.append(Token.Token('DELIM', '"', current_line))
     else: 
         allTokens.append(Token.Token('IO', 'writeline', current_line))
         allTokens.append(Token.Token('IDENTIFIER', nextToken, current_line))
-
     return True, allTokens
 
 def check_if(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
@@ -114,16 +124,18 @@ def check_if(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Toke
     """
     compare_operators = ["=="]
 
-    if tokenlist.next() != 'if':
+    nextToken,tokenlist = tokenlist.next()
+
+    if nextToken != 'if':
         return False, None 
 
-    var1 = tokenlist.next()
+    var1,tokenlist = tokenlist.next()
 
-    compare_operator = tokenlist.next()
+    compare_operator,tokenlist = tokenlist.next()
     if compare_operator not in compare_operators:
         return False, None
 
-    var2 = tokenlist.next()
+    var2,tokenlist = tokenlist.next()
     alltokens = [Token.Token("CONDITIONAL", "if", current_line), Token.Token("IDENTIFIER", var1, current_line), Token.Token("COMPARE", compare_operator, current_line), Token.Token("IDENTIFIER", var2, current_line)]
     return True, alltokens
     
@@ -137,8 +149,9 @@ def check_exit(tokenlist : List[str], current_line : int) -> Tuple[bool, List[To
     Returns:
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
     """
-   
-    if tokenlist.next() != 'exit':
+    nextToken,tokenlist = tokenlist.next()
+
+    if nextToken != 'exit':
         return False, None 
 
 
@@ -161,16 +174,16 @@ def check_assignment(tokenlist : List[str], current_line : int) -> Tuple[bool, L
     }
 
     assignment_operators = ['=']
-    variable_keyword = tokenlist.next()
+    variable_keyword,tokenlist = tokenlist.next()
     if variable_keyword not in variable_keywords:
         return False, None 
 
-    name = tokenlist.next()
-    assignment_operator = tokenlist.next()
+    name,tokenlist = tokenlist.next()
+    assignment_operator,tokenlist = tokenlist.next()
     if assignment_operator not in assignment_operators:
         return False, None 
 
-    value = tokenlist.next()
+    value,tokenlist = tokenlist.next()
 
     if type(eval(value)) != variable_keywords[variable_keyword]:
         return False, [Token.Token('ERROR', 'Error: Value does not match type', current_line)]

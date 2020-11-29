@@ -100,9 +100,9 @@ def main(argv):
 
     # Run the interpreter
     interpreted = interpret(ast)
+
     while interpreted != None:
         interpreted = interpreted.run()
-    # print(interpreted)
 
     return 0, []
 

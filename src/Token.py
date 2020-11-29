@@ -25,6 +25,6 @@ class TokenList:
         Returns:
             Token: The next token in the list
         """
-        theToken = self.tokenlist[0]
-        self.tokenlist = self.tokenlist[1:] # pop 
-        return theToken
+        # theToken = self.tokenlist[0]
+        # self.tokenlist = self.tokenlist[1:] # pop 
+        return (self.tokenlist[0], TokenList(self.tokenlist[1:]))
