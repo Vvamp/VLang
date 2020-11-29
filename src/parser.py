@@ -75,6 +75,20 @@ def check_write(tokenlist : List[str], current_line : int) -> Tuple[bool, List[T
         allTokens.append(Token.Token('IDENTIFIER', nextToken, current_line))
     return True, allTokens
     
+
+def check_emptyline(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+    nextToken,tokenlist = tokenlist.next()
+    if nextToken != "\n":
+        return False, None 
+    return True, [Token.Token('IGNORE', 'newline', current_line)]
+
+def check_commentline(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+    nextToken,tokenlist = tokenlist.next()
+    if nextToken != "#":
+        return False, None 
+    return True, [Token.Token('IGNORE', 'commentline', current_line)]
+
+
 def check_writeln(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
     """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
     If it isn't of the type 'goto', the first value will return False and the second value wil return None.
@@ -188,11 +202,12 @@ def check_assignment(tokenlist : List[str], current_line : int) -> Tuple[bool, L
     if type(eval(value)) != variable_keywords[variable_keyword]:
         return False, [Token.Token('ERROR', 'Error: Value does not match type', current_line)]
     #todo: without append, just a singular list in 1 call
-    tokens = []
-    tokens.append(Token.Token('TYPE', variable_keyword, current_line))
-    tokens.append(Token.Token('IDENTIFIER', name, current_line))
-    tokens.append(Token.Token('ASSIGNMENT', assignment_operator, current_line))
-    tokens.append(Token.Token('VALUE', value, current_line))
+    tokens = [Token.Token('TYPE', variable_keyword, current_line), Token.Token('IDENTIFIER', name, current_line), 
+    Token.Token('ASSIGNMENT', assignment_operator, current_line), Token.Token('VALUE', value, current_line)]
+    # tokens.append(Token.Token('TYPE', variable_keyword, current_line))
+    # tokens.append(Token.Token('IDENTIFIER', name, current_line))
+    # tokens.append(Token.Token('ASSIGNMENT', assignment_operator, current_line))
+    # tokens.append(Token.Token('VALUE', value, current_line))
 
     return True, tokens
 
@@ -205,6 +220,14 @@ def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]
         List[Token.Token]: A list of tokens based on the instruction with the parameter
     """
     thetokenlist = Token.TokenList(tokenlist)
+
+    result,checktokens = check_emptyline(copy.deepcopy(thetokenlist), current_line)
+    if result:
+        return checktokens
+
+    result,checktokens = check_commentline(copy.deepcopy(thetokenlist), current_line)
+    if result:
+        return checktokens
 
     # Check if the current instruction is a location statement
     result,checktokens = check_location(copy.deepcopy(thetokenlist), current_line)

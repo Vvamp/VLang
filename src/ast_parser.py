@@ -76,8 +76,7 @@ def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]
         valNodes = []
         for node in parsed_partmap[beginIndex:otherdelimIndex]:
             valNodes.append(node.symbol)
-    
-            
+
         thisNode = WriteLnNode(rootNode, valNodes, isVariable)
 
     elif parsed_partmap[0].tokentype == "TYPE":
@@ -93,7 +92,9 @@ def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]
         thisNode = IfNode(rootNode, parsed_partmap[1].symbol, parsed_partmap[3].symbol, parsed_partmap[2].symbol)
 
         # Next one is also part of the AST node 
-
+    elif parsed_partmap[0].tokentype == "IGNORE":
+        indexesUsed = 1
+        return  createAST(parsed_partmap[indexesUsed:], rootNode)
     return [thisNode] + createAST(parsed_partmap[indexesUsed:], rootNode)
 
 
