@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import sys 
 class Memory():
     def __init__(self, items : List[MemoryBlock]=[], pc : int=0):
@@ -84,11 +84,32 @@ class LocationMemoryBlock(MemoryBlock):
         """
         return pc+1
 
-def checkVar(memblock : MemoryBlock, name : str) -> str:
+def checkVar(memblock : MemoryBlock, name : str) -> Union[str, None]:
+    """Checks if the current memory block contains the var with the given name
+
+    Args:
+        memblock (MemoryBlock): The memory block to check
+        name (str): The variable's name
+
+    Returns(either):
+        str: The value of the variable 
+        None: If the value wasn't found, return None
+    """
     if type(memblock) == AssignmentMemoryBlock:
         if str(memblock.lhs) == str(name):
             return memblock.rhs
-def findFirstVar(results):
+    return None
+
+def findFirstVar(results : List[Union[None, int]]) -> Union[None, int]:
+    """Finds the first index in a list of none's
+
+    Args:
+        results (List[Union[None, int]]): A list of none's and integers
+
+    Returns(either):
+        int: The first item's value(index)
+        None: If there were no indexes in the list, return none
+    """
     if len(results) == 0:
         return None 
     if results[0] is not None:
@@ -116,6 +137,12 @@ def findVar(memory : Memory, name : str) -> str:
         return name
     
 def runWrite(word : str, rhs : List[str]):
+    """Writes a word to the terminal and if it's not the last word in the rhs, write a space
+
+    Args:
+        word (str): [description]
+        rhs (List[str]): [description]
+    """
     print(word, end="")
     if rhs.index(word) != len(rhs)-1:
         print(" ", end="")
@@ -159,6 +186,16 @@ class WriteMemoryBlock(MemoryBlock):
 
 
 def findLabel(memblock : MemoryBlock, name : str, memory : Memory) -> str:
+    """Checks if a memory block has a label and return the index of it
+
+    Args:
+        memblock (MemoryBlock): The memory block to find the index of
+        name (str): The name to find
+        memory (Memory): The memory to look in
+
+    Returns:
+        str: [description]
+    """
     if memblock.label == name:
         return memory.items.index(memblock)
 
