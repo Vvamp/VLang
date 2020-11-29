@@ -201,9 +201,9 @@ def check_assignment(tokenlist : List[str], current_line : int) -> Tuple[bool, L
 
     if type(eval(value)) != variable_keywords[variable_keyword]:
         return False, [Token.Token('ERROR', 'Error: Value does not match type', current_line)]
-    #todo: without append, just a singular list in 1 call
+
     tokens = [Token.Token('TYPE', variable_keyword, current_line), Token.Token('IDENTIFIER', name, current_line), 
-    Token.Token('ASSIGNMENT', assignment_operator, current_line), Token.Token('VALUE', value, current_line)]
+            Token.Token('ASSIGNMENT', assignment_operator, current_line), Token.Token('VALUE', value, current_line)]
     # tokens.append(Token.Token('TYPE', variable_keyword, current_line))
     # tokens.append(Token.Token('IDENTIFIER', name, current_line))
     # tokens.append(Token.Token('ASSIGNMENT', assignment_operator, current_line))
@@ -264,8 +264,7 @@ def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]
         return checktokens
 
 
-    # If the current instruction doesn't exist, return a NoneType
-    # todo: result in check function becomes an int: 1 is true, 0 is false 2 is error
+    # todo: (Optional): For better error checking, return an error instead of none if it does match the first keyword per check(i.e. if val1 (instead of if val1 == val2) returns the error: insufficient parameters(or similar))
     return [Token.Token('ERROR', "Error: unknown instruction '{}'".format(copy.deepcopy(thetokenlist).next()), current_line)]
 
 

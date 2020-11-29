@@ -2,13 +2,17 @@ from typing import List
 import lexer, Token
 from ast_nodes import LocationNode, GotoNode, Node, WriteNode, WriteLnNode, AssignmentNode, IfNode, ExitNode
 
+def checkIndexByType(results):
+    if len(results) == 0:
+        return None
+    if results[0] != None:
+        return results[0]
+    return checkIndexByType(results[1:])
+
 def findIndexByType(thelist, thetype):
-    print("Searching list: {}".format(thelist))
-    #todo functional
-    for elem in thelist:
-        if elem.tokentype == thetype:
-            return  thelist.index(elem)
-    return False
+    results = list( map(lambda element: thelist.index(element) if element.tokentype == thetype else None, thelist) ) 
+    return checkIndexByType(results)
+ 
 
 def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]:
     """[summary]

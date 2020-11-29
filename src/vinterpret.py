@@ -55,6 +55,7 @@ def interpret(ast):
 
     # a = map(interpret_node, mem, ast)  
     a = mem   
+
     #todo no for loops
     for node in ast:
         a = interpret_node(node, a)
@@ -75,7 +76,6 @@ def check_errors(tokenmap, tokenlist = [], errorlist = []):
 
 
 def main(argv):
-    #todo: read multiple files
     f = open(argv[0], "r")
     all_lines = f.readlines()
     f.close()
@@ -100,7 +100,8 @@ def main(argv):
 
     # Run the interpreter
     interpreted = interpret(ast)
-
+    
+    #todo no loop: create a recursive function 
     while interpreted != None:
         interpreted = interpreted.run()
 

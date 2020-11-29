@@ -14,7 +14,6 @@ class Token:
         self.symbol = symbol 
         self.line = linenr
 
-#todo: Probably not functional since it has a state. Maye return the new token list and the new token?
 class TokenList:
     def __init__(self, tokenlist):
         self.tokenlist = tokenlist 
