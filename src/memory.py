@@ -107,6 +107,11 @@ def findVar(memory : Memory, name : str) -> str:
         print(1/0)
         return name
     
+def runWrite(word : str, rhs : List[str]):
+    print(word, end="")
+    if rhs.index(word) != len(rhs)-1:
+        print(" ", end="")
+
 
 class WriteMemoryBlock(MemoryBlock):
     def __init__(self, label : str, rhs : List[str],  writeLine : bool, isVariable = False, memory = None):
@@ -137,11 +142,9 @@ class WriteMemoryBlock(MemoryBlock):
         if self.isVariable:
             # Find variable in memory and grab value
             findVar(self.memory, self.rhs[0])
-        #todo: recusrive
-        for word in self.rhs:
-            print(word, end="")
-            if self.rhs.index(word) != len(self.rhs)-1:
-                print(" ", end="")
+            
+        result = list( map(lambda word: runWrite(word, self.rhs), self.rhs) )
+            
         if self.writeLine:
             print("\n", end="")
         return pc+1
