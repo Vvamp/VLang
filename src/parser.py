@@ -265,7 +265,7 @@ def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]
     return [Token.Token('ERROR', "Error: unknown instruction '{}'".format(copy.deepcopy(thetokenlist).next()), current_line)]
 
 
-def parse_with_lines(tokenmap : List(str), current_line : int=1) -> List(Token.Token):
+def parse_with_lines(tokenmap : List[str], current_line : int=1) -> List[Token.Token]:
     """Recursively parses the tokenmap and passes the current line to it
 
     Args:

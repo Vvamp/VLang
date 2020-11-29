@@ -1,6 +1,6 @@
 
 class Node(object):
-    def __init__(self, parent : Node):
+    def __init__(self, parent):
         """Initializes an empty node
 
         Args:

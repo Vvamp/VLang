@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List, Tuple
 import sys 
 class Memory():
-    def __init__(self, items : List(MemoryBlock)=[], pc : int=0):
+    def __init__(self, items : List[MemoryBlock]=[], pc : int=0):
         """Initializes a memory object with a list of memory blocks and a program counter
 
         Args:

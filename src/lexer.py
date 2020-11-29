@@ -19,7 +19,7 @@ def flatten(unflattened_list : List[List[Token.Token]]) -> List[Token.Token]:
     return head + flatten(tail)
 
 
-def lexLine(line : str) -> List(str):
+def lexLine(line : str) -> List[str]:
     """Tokenizes a code line
 
     Args:

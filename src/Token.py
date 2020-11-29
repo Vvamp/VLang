@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, Tuple
 
 class Token:
@@ -16,7 +17,7 @@ class Token:
         self.line = linenr
 
 class TokenList:
-    def __init__(self, tokenlist : List(Token)):
+    def __init__(self, tokenlist : List[Token]):
         """Initializes a TokenList object based on a list of tokens
 
         Args:

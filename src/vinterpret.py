@@ -24,7 +24,7 @@ from typing import Union, List, Tuple
 
 
 
-def interpret_node(ast_node : Node, mem : memory.Memory) -> Union(memory.Memory, None): 
+def interpret_node(ast_node : Node, mem : memory.Memory) -> Union[memory.Memory, None]: 
     """Interprets an ast node. creates a memory block and pushes the memory block to the memory
 
     Args:
@@ -78,7 +78,7 @@ def interpret_node(ast_node : Node, mem : memory.Memory) -> Union(memory.Memory,
     return None
     
 
-def interpret_rec(ast : List(Node), mem : memory.Memory) -> memory.Memory:
+def interpret_rec(ast : List[Node], mem : memory.Memory) -> memory.Memory:
     """Recursively interprets an AST tree into the given memory
 
     Args:
@@ -96,7 +96,7 @@ def interpret_rec(ast : List(Node), mem : memory.Memory) -> memory.Memory:
     a = interpret_rec(ast[0:2], mem)
     return interpret_rec(ast[2:], a)
 
-def interpret(ast : List(Node)) -> memory.Memory:
+def interpret(ast : List[Node]) -> memory.Memory:
     """Interprets an AST Tree into a memory object
 
     Args:
@@ -111,7 +111,7 @@ def interpret(ast : List(Node)) -> memory.Memory:
 
     
 
-def check_errors(tokenmap : List(Token.Token), tokenlist : List(Token.Token)=[], errorlist : List(Token.Token)=[]) -> Tuple(List(Token.Token), List(Token.Token)):
+def check_errors(tokenmap : List[Token.Token], tokenlist : List[Token.Token]=[], errorlist : List[Token.Token]=[]) -> Tuple[List[Token.Token], List[Token.Token]]:
     """Checks for errors in a tokenmap and returns those errors in a seperate list
 
     Args:
@@ -131,7 +131,7 @@ def check_errors(tokenmap : List(Token.Token), tokenlist : List(Token.Token)=[],
     next_tokens_tokenlist, next_tokens_errorlist = check_errors(tokenmap[1:], tokenlist, errorlist)
     return (current_token_tokenlist + next_tokens_tokenlist, current_token_errorlist + next_tokens_errorlist)
 
-def run_interpreter(interpreted : memory.Memory) -> Union(memory.Memory, None):
+def run_interpreter(interpreted : memory.Memory) -> Union[memory.Memory, None]:
     """Runs the instructions in the memory
 
     Args:
@@ -153,7 +153,7 @@ def printWelcome():
     print("VLang {} (Git Version)".format(version))
     print("Created by Vincent van Setten", end="\n=======================\n\n")
 
-def main(argv : List(str)) -> Tuple(int, List(Token.Token)):
+def main(argv : List[str]) -> Tuple[int, List[Token.Token]]:
     """The main function
 
     Args:

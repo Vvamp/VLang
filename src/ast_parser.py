@@ -2,7 +2,7 @@ from typing import List, Union
 import lexer, Token
 from ast_nodes import LocationNode, GotoNode, Node, WriteNode, WriteLnNode, AssignmentNode, IfNode, ExitNode
 
-def checkIndexByType(results : List(int)) -> Union(int, None): 
+def checkIndexByType(results : List[int]) -> Union[int,None]: 
     """Recursively find the first index that is not none
 
     Args:
@@ -18,7 +18,7 @@ def checkIndexByType(results : List(int)) -> Union(int, None):
         return results[0]
     return checkIndexByType(results[1:])
 
-def findIndexByType(thelist : List(Token.Token), thetype : str) -> Union(int, None) :
+def findIndexByType(thelist : List[Token.Token], thetype : str) -> Union[int, None] :
     """Find index of an element based on its type
 
     Args:
