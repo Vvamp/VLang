@@ -185,6 +185,9 @@ def main(argv : List[str]) -> Tuple[int, List[Token.Token]]:
     ast = ast_parser.parse(parsedmap)
 
     # Run the interpreter
+    ## Note: I used a while loop here due to a recursion depth error 
+    ## Below I have the function call that makes it work recursively. 
+    ## It changes nothing to the code's behaviour, but recursive limtis the program to 1000 memory blocks due to recursion depth.
     interpreted = interpret(ast)
     while interpreted != None:
         interpreted = interpreted.run()
