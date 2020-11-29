@@ -149,7 +149,7 @@ def run_interpreter(interpreted : memory.Memory) -> Union[memory.Memory, None]:
 def printWelcome():
     """Prints the welcome screen to the terminal
     """
-    version="0.5.3"
+    version="1.0.0"
     print("VLang {} (Git Version)".format(version))
     print("Created by Vincent van Setten", end="\n=======================\n\n")
 
