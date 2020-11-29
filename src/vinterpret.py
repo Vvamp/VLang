@@ -186,7 +186,11 @@ def main(argv : List[str]) -> Tuple[int, List[Token.Token]]:
 
     # Run the interpreter
     interpreted = interpret(ast)
-    run_interpreter(interpreted)
+    while interpreted != None:
+        interpreted = interpreted.run()
+
+    # Recursive: 
+    # run_interpreter(interpreted)
 
     return 0, []
 
