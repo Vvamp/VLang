@@ -14,3 +14,7 @@ int fourthInt = 9
 if thirdInt == secondInt
     writeLine "I am also true" 
 writeLine "I am also true or false"
+
+location loop 
+writeLine "Loop!"
+goto loop 

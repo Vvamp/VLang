@@ -17,7 +17,7 @@ def check_location(tokenlist : List[str], current_line : int) -> Tuple[bool, Lis
         return False, [Token.Token('ERROR', "Token is not of type 'location'", current_line)] 
 
     nameToken,tokenlist = tokenlist.next()
-    return True, [Token.Token('LOCATION', 'location', current_line), Token.Token('NAME', nameToken.next(), current_line)] 
+    return True, [Token.Token('LOCATION', 'location', current_line), Token.Token('NAME', nameToken, current_line)] 
     
 def check_goto(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
     """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 

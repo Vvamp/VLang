@@ -84,6 +84,17 @@ class LocationMemoryBlock(MemoryBlock):
         """
         return pc+1
 
+def checkVar(memblock : MemoryBlock, name : str) -> str:
+    if type(memblock) == AssignmentMemoryBlock:
+        if str(memblock.lhs) == str(name):
+            return memblock.rhs
+def findFirstVar(results):
+    if len(results) == 0:
+        return None 
+    if results[0] is not None:
+        return results[0]
+    return findFirstVar(results[1:])
+
 def findVar(memory : Memory, name : str) -> str:
     """Attempts to find the value of a variable in the current memory block
 
@@ -96,15 +107,12 @@ def findVar(memory : Memory, name : str) -> str:
     """
 
     oldvar = name
-    # todo: no for
-    for memblock in memory.items:
-         if type(memblock) == AssignmentMemoryBlock:
-                if str(memblock.lhs) == str(name):
-                    name = memblock.rhs
-                    return name 
+    # result = list( map(checkVar, memory.items, name))
+    result = list( map(lambda item: checkVar(item, name) , memory.items))
+    newname = findFirstVar(result)
+   
     if oldvar == name:
         print("Error: var not found")
-        print(1/0)
         return name
     
 def runWrite(word : str, rhs : List[str]):
@@ -142,12 +150,17 @@ class WriteMemoryBlock(MemoryBlock):
         if self.isVariable:
             # Find variable in memory and grab value
             findVar(self.memory, self.rhs[0])
-            
+
         result = list( map(lambda word: runWrite(word, self.rhs), self.rhs) )
             
         if self.writeLine:
             print("\n", end="")
         return pc+1
+
+
+def findLabel(memblock : MemoryBlock, name : str, memory : Memory) -> str:
+    if memblock.label == name:
+        return memory.items.index(memblock)
 
 class GotoMemoryBlock(MemoryBlock):
     def __init__(self, label: str, rhs : str, memory : Memory):
@@ -161,7 +174,7 @@ class GotoMemoryBlock(MemoryBlock):
         MemoryBlock.__init__(self, label)
         self.rhs = rhs 
         self.memory = memory
-    #todo: recusrive
+
     def run(self, pc : int) -> int:
         """Runs the goto memory block
 
@@ -171,9 +184,8 @@ class GotoMemoryBlock(MemoryBlock):
         Returns:
             int:  The program counter after the memory block has ran
         """
-        for memblock in self.memory.items:
-            if memblock.label == self.rhs: 
-                return self.memory.items.index(memblock)
+        results = list( map(lambda item: findLabel(item, self.rhs, self.memory), self.memory.items) )
+        return findFirstVar(results)
         
 class AssignmentMemoryBlock(MemoryBlock):
     def __init__(self, label: str, lhs: str, rhs : str, asstype : str):
