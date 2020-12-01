@@ -108,6 +108,19 @@ class AssignmentModNode(Node):
         self.rhs = rhs
         self.asstype = asstype
 
+class JumpNode(Node):
+    def __init__(self, parent : Node, rhs : str, isStatic : bool = False):
+        """Initializes a jump node
+
+        Args:
+            parent (Node): The node's parent 
+            rhs (str): The location to jump to
+            isStatic (bool, optional): Whether the rhs is a static location or relative. Defaults to False
+        """
+        self.node = Node(parent)
+        self.parent = self.node.parent 
+        self.rhs = rhs 
+        self.isStatic = isStatic
 
 class ExitNode(Node):
     def __init__(self, parent : Node):

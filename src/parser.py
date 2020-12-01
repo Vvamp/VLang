@@ -1,16 +1,17 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import lexer, Token, copy
 
 
-def check_location(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+def check_location(tokenlist : List[str], current_line : int) -> Tuple[bool, Union[List[Token.Token], None]]:
     """Checks if the given construction is of the type 'location'. If it is, the first value will return True and the second value will return a list of tokens. 
-    If it isn't of the type 'location', the first value will return False and the second value wil return None.
+    If it isn't of the type 'location', the first value will return False and the second value wil return None or an error token.
 
     Args:
         tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
 
-    Returns:
+    Returns(either):
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
     """
     nextToken,tokenlist = tokenlist.next()
     if nextToken != 'location':
@@ -21,13 +22,14 @@ def check_location(tokenlist : List[str], current_line : int) -> Tuple[bool, Lis
     
 def check_goto(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
     """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
-    If it isn't of the type 'goto', the first value will return False and the second value wil return None.
+    If it isn't of the type 'goto', the first value will return False and the second value wil return None or an error token.
 
     Args:
         tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
 
-    Returns:
+    Returns(either):
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
     """
     nextToken,tokenlist = tokenlist.next()
 
@@ -40,14 +42,15 @@ def check_goto(tokenlist : List[str], current_line : int) -> Tuple[bool, List[To
     return True, [Token.Token('GOTO', 'goto', current_line), Token.Token('NAME', nameToken, current_line)]
     
 def check_write(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
-    """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
-    If it isn't of the type 'goto', the first value will return False and the second value wil return None.
+    """Checks if the given construction is of the type 'write'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'write', the first value will return False and the second value wil return None or an error token.
 
     Args:
         tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
 
-    Returns:
+    Returns(either):
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
     """
     nextToken,tokenlist = tokenlist.next()
 
@@ -77,27 +80,84 @@ def check_write(tokenlist : List[str], current_line : int) -> Tuple[bool, List[T
     
 
 def check_emptyline(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+    """Checks if the given construction is of the type 'emptyline'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'emptyline', the first value will return False and the second value wil return None or an error token.
+
+    Args:
+        tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
+
+    Returns(either):
+        bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
+    """
     nextToken,tokenlist = tokenlist.next()
     if nextToken != "\n":
         return False, [Token.Token('ERROR', "Token is not of type 'empty line'", current_line)] 
     return True, [Token.Token('IGNORE', 'newline', current_line)]
 
 def check_commentline(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+    """Checks if the given construction is of the type 'comment'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'comment', the first value will return False and the second value wil return None or an error token.
+
+    Args:
+        tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
+
+    Returns(either):
+        bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
+    """
     nextToken,tokenlist = tokenlist.next()
     if nextToken != "#":
         return False, [Token.Token('ERROR', "Token is not of type 'comment'", current_line)] 
     return True, [Token.Token('IGNORE', 'commentline', current_line)]
 
-
-def check_writeln(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
-    """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
-    If it isn't of the type 'goto', the first value will return False and the second value wil return None.
+def check_jump(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+    """Checks if the given construction is of the type 'jump'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'jump', the first value will return False and the second value wil return None or an error token.
 
     Args:
         tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
 
-    Returns:
+    Returns(either):
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
+    """
+    nextToken,tokenlist = tokenlist.next()
+    if nextToken != "jump":
+        return False, [Token.Token('ERROR', "Token is not of type 'jump'", current_line)] 
+    
+    nameToken,secondtokenlist = tokenlist.next()
+    return True, [Token.Token('JUMP', 'jump', current_line), Token.Token('NAME', nameToken, current_line)]
+
+def check_jumpto(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+    """Checks if the given construction is of the type 'jumpto'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'numpto', the first value will return False and the second value wil return None or an error token.
+
+    Args:
+        tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
+
+    Returns(either):
+        bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
+    """
+    nextToken,tokenlist = tokenlist.next()
+    if nextToken != "jumpTo":
+        return False, [Token.Token('ERROR', "Token is not of type 'jumpto'", current_line)] 
+    
+    nameToken,secondtokenlist = tokenlist.next()
+    return True, [Token.Token('JUMP', 'jumpto', current_line), Token.Token('NAME', nameToken, current_line)]
+
+
+def check_writeln(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+    """Checks if the given construction is of the type 'writeln'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'writeln', the first value will return False and the second value wil return None or an error token.
+
+    Args:
+        tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
+
+    Returns(either):
+        bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
     """
     nextToken,tokenlist = tokenlist.next()
 
@@ -127,14 +187,15 @@ def check_writeln(tokenlist : List[str], current_line : int) -> Tuple[bool, List
     return True, allTokens
 
 def check_if(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
-    """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
-    If it isn't of the type 'goto', the first value will return False and the second value wil return None.
+    """Checks if the given construction is of the type 'location'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'location', the first value will return False and the second value wil return None or an error token.
 
     Args:
         tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
 
-    Returns:
+    Returns(either):
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
     """
     compare_operators = ["=="]
 
@@ -154,14 +215,15 @@ def check_if(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Toke
     return True, alltokens
     
 def check_exit(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
-    """Checks if the given construction is of the type 'goto'. If it is, the first value will return True and the second value will return a list of tokens. 
-    If it isn't of the type 'goto', the first value will return False and the second value wil return None.
+    """Checks if the given construction is of the type 'exit'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'exit', the first value will return False and the second value wil return None or an error token.
 
     Args:
         tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
 
-    Returns:
+    Returns(either):
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
     """
     nextToken,tokenlist = tokenlist.next()
 
@@ -174,14 +236,15 @@ def check_exit(tokenlist : List[str], current_line : int) -> Tuple[bool, List[To
 
 
 def check_assignment(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
-    """Checks if the given construction is of the type 'location'. If it is, the first value will return True and the second value will return a list of tokens. 
-    If it isn't of the type 'location', the first value will return False and the second value wil return None.
+    """Checks if the given construction is of the type 'assignment'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'assignment', the first value will return False and the second value wil return None or an error token.
 
     Args:
         tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
 
-    Returns:
+    Returns(either):
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
     """
     variable_keywords = {
         "int": int
@@ -208,16 +271,17 @@ def check_assignment(tokenlist : List[str], current_line : int) -> Tuple[bool, L
     return True, tokens
 
 def check_modval(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
-    """Checks if the given construction is of the type 'location'. If it is, the first value will return True and the second value will return a list of tokens. 
-    If it isn't of the type 'location', the first value will return False and the second value wil return None.
+    """Checks if the given construction is of the type 'modval'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'modval', the first value will return False and the second value wil return None or an error token.
 
     Args:
         tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
 
-    Returns:
+    Returns(either):
         bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
     """
-    assignment_operators = ['+=', '-=']
+    assignment_operators = ['+=', '-=', '=']
 
     name,tokenlist = tokenlist.next()
 
@@ -282,10 +346,22 @@ def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]
     if result:
         return checktokens
 
+     # Check if the current instruction is a jump statement 
+    result,checktokens = check_jump(copy.deepcopy(thetokenlist), current_line)
+    if result:
+        return checktokens
+
+    # Check if the current instruction is a jumpto statement 
+    result,checktokens = check_jumpto(copy.deepcopy(thetokenlist), current_line)
+    if result:
+        return checktokens
+
 
     result,checktokens = check_exit(copy.deepcopy(thetokenlist), current_line)
     if result:
         return checktokens
+
+
 
     # Check if the current instruction is a modify value assignment 
     result,checktokens = check_modval(copy.deepcopy(thetokenlist), current_line)

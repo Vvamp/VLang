@@ -379,6 +379,8 @@ class AssignmentModMemoryBlock(MemoryBlock):
             newtable = table.increaseVariable(self.lhs, self.rhs)
         elif self.asstype == "-=":
             newtable = table.decreaseVariable(self.lhs, self.rhs)
+        elif self.asstype == "=":
+            newtable = table.modVariable(self.lhs, self.rhs)
 
         return (pc + 1, newtable)
 
@@ -413,6 +415,33 @@ class IfMemoryBlock(MemoryBlock):
                 return pc + 1
 
         return pc+2
+
+class JumpMemoryBlock(MemoryBlock):
+    def __init__(self, label : str, rhs : str, isStatic : bool):
+        """Initializes a Jump memory block
+
+        Args:
+            label (str): The memory block's label 
+            rhs (str): The place to jump to 
+            isStatic (bool): Whether the place is static or relative
+        """
+        self.label = label 
+        self.rhs = rhs 
+        self.isStatic = isStatic 
+    
+    def run(self, pc : int) -> int:
+        """Runs the jump block
+
+        Args:
+            pc (int): The current program counter
+
+        Returns:
+            int: The program counter after the jump was run
+        """
+        if self.isStatic:
+            return int(self.rhs)
+        else:
+            return pc + int(self.rhs)
 
 class ExitMemoryBlock(MemoryBlock):
     def run(self, pc : int):

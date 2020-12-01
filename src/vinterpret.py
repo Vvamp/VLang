@@ -2,7 +2,7 @@ import sys, getopt
 import functools
 import parser, lexer, ast_parser
 import copy
-from ast_nodes import Node, LocationNode, GotoNode, WriteNode, WriteLnNode, AssignmentNode, IfNode, ExitNode, AssignmentModNode
+from ast_nodes import Node, LocationNode, GotoNode, WriteNode, WriteLnNode, AssignmentNode, IfNode, ExitNode, AssignmentModNode, JumpNode
 import memory
 import Token
 from typing import Union, List, Tuple
@@ -75,6 +75,10 @@ def interpret_node(ast_node : Node, mem : memory.Memory) -> Union[memory.Memory,
         return mem.push(NewBlock)
     elif type(ast_node) is ExitNode:
         NewBlock = memory.ExitMemoryBlock("__SYS__EXIT__")
+        return mem.push(NewBlock)
+
+    elif type(ast_node) is JumpNode:
+        NewBlock = memory.JumpMemoryBlock("", ast_node.rhs, ast_node.isStatic)
         return mem.push(NewBlock)
 
     else:
