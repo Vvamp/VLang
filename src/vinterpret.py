@@ -2,11 +2,11 @@ import sys, getopt
 import functools
 import parser, lexer, ast_parser
 import copy
-from ast_nodes import Node, LocationNode, GotoNode, WriteNode, WriteLnNode, AssignmentNode, IfNode, ExitNode
+from ast_nodes import Node, LocationNode, GotoNode, WriteNode, WriteLnNode, AssignmentNode, IfNode, ExitNode, AssignmentModNode
 import memory
 import Token
 from typing import Union, List, Tuple
-
+import time
 # Dear Reader/Teacher,
 #
 # In the beginning of this course, I had a very small understanding of the structure of an interpreter. 
@@ -35,6 +35,7 @@ def interpret_node(ast_node : Node, mem : memory.Memory) -> Union[memory.Memory,
         - memory.Memory: The new memory with the interpreted ast
         - None: If the node could not be interpreted, None is returned
     """
+
     # print("Interpreting Node: {}".format(ast_node))
     if type(ast_node) is LocationNode:
         NewBlock = memory.LocationMemoryBlock(ast_node.rhs)
@@ -68,7 +69,10 @@ def interpret_node(ast_node : Node, mem : memory.Memory) -> Union[memory.Memory,
         # print("If {} {} {}".format(ast_node.lhs, ast_node.compare_operator, ast_node.rhs))
 
         return mem.push(NewBlock)
-
+    elif type(ast_node) is AssignmentModNode:
+        NewBlock = memory.AssignmentModMemoryBlock("", ast_node.lhs, ast_node.rhs, ast_node.asstype, mem)
+        
+        return mem.push(NewBlock)
     elif type(ast_node) is ExitNode:
         NewBlock = memory.ExitMemoryBlock("__SYS__EXIT__")
         return mem.push(NewBlock)
@@ -169,6 +173,10 @@ def main(argv : List[str]) -> Tuple[int, List[Token.Token]]:
     f = open(argv[0], "r")
     all_lines = f.readlines()
     f.close()
+   
+    # Create a variable lookup table
+    table = memory.LookUpTable()
+    # table = table.addVariable("___memcheck___", 0)
 
     # Tokenize the text
     tokenmap = lexer.lex(all_lines)
@@ -184,13 +192,17 @@ def main(argv : List[str]) -> Tuple[int, List[Token.Token]]:
     # Create an AST tree from the tokenized list 
     ast = ast_parser.parse(parsedmap)
 
+
     # Run the interpreter
     ## Note: I used a while loop here due to a recursion depth error 
     ## Below I have the function call that makes it work recursively. 
     ## It changes nothing to the code's behaviour, but recursive limtis the program to 1000 memory blocks due to recursion depth.
     interpreted = interpret(ast)
     while interpreted != None:
-        interpreted = interpreted.run()
+        results = interpreted.run(table)
+        if results is None:
+            break
+        interpreted,table = results
 
     # Recursive: 
     # run_interpreter(interpreted)

@@ -207,6 +207,32 @@ def check_assignment(tokenlist : List[str], current_line : int) -> Tuple[bool, L
    
     return True, tokens
 
+def check_modval(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+    """Checks if the given construction is of the type 'location'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'location', the first value will return False and the second value wil return None.
+
+    Args:
+        tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
+
+    Returns:
+        bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+    """
+    assignment_operators = ['+=', '-=']
+
+    name,tokenlist = tokenlist.next()
+
+    assignment_operator,tokenlist = tokenlist.next()
+    if assignment_operator not in assignment_operators:
+        return True, [Token.Token('ERROR', "Unknown assignment operator", current_line)] 
+
+    value,tokenlist = tokenlist.next()
+
+   
+    tokens = [Token.Token('IDENTIFIER', name, current_line), 
+            Token.Token('ASSIGNMENT', assignment_operator, current_line), Token.Token('VALUE', value, current_line)]
+   
+    return True, tokens
+
 def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]:
     """Creates tokens based on an instruction and their parameters
 
@@ -256,10 +282,15 @@ def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]
     if result:
         return checktokens
 
+
     result,checktokens = check_exit(copy.deepcopy(thetokenlist), current_line)
     if result:
         return checktokens
 
+    # Check if the current instruction is a modify value assignment 
+    result,checktokens = check_modval(copy.deepcopy(thetokenlist), current_line)
+    if result:
+        return checktokens
 
     # todo: (Optional): For better error checking, return an error instead of none if it does match the first keyword per check(i.e. if val1 (instead of if val1 == val2) returns the error: insufficient parameters(or similar))
     return [Token.Token('ERROR', "Error: unknown instruction '{}'".format(copy.deepcopy(thetokenlist).next()), current_line)]

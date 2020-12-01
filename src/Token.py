@@ -31,4 +31,6 @@ class TokenList:
         Returns:
             Tuple(Token, TokenList): A tuple of the next token in the list and a lsit without the token
         """
+
         return (self.tokenlist[0], TokenList(self.tokenlist[1:]))
+        

@@ -92,6 +92,23 @@ class IfNode(Node):
         self.rhs = rhs 
         self.compare_operator = compare_operator
 
+class AssignmentModNode(Node):
+    def __init__(self, parent : Node, lhs : str, rhs : str, asstype : str):
+        """Initializes an assignment node
+
+        Args:
+            parent (Node): The node's parent
+            lhs (str): The node's identifier
+            rhs (str): The node's variable
+            asstype (str): The node's assignment, i.e. += or -=
+        """
+        self.node = Node(parent)
+        self.parent = self.node.parent 
+        self.lhs = lhs 
+        self.rhs = rhs
+        self.asstype = asstype
+
+
 class ExitNode(Node):
     def __init__(self, parent : Node):
         """Initializes an exit node(quits the program)
