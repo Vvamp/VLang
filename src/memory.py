@@ -2,57 +2,165 @@ from __future__ import annotations
 from typing import List, Tuple, Union
 import sys 
 
+def modvar(item : LookUpItem, name : str, value, items : List[LookUpItem]) -> Union[None, LookUpTable]:
+    """Modifies a variable with the given value
+
+    Args:
+        item (LookUpItem): The current item to possibly modify 
+        name (str): The name of the variable to modify
+        value ([type]): The value to set the variable to 
+        items (List[LookUpItem]): The list of all items that can possibly be the variable the modify
+
+    Returns:
+        Union[None, LookUpTable]: If the variable exists, return a new table with the modified variable. If it does not exist, return None
+    """
+    if item.name == name:
+        index = items.index(item)
+
+        upperbound = index+1
+
+        items_without_mod = items[:index] + items[upperbound:]
+        table_without_mod = LookUpTable(items_without_mod)
+        table_with_mod = table_without_mod.addVariable(name, value)
+        return table_with_mod
+    else: 
+        return None
+
+
+def findLabel(memblock : MemoryBlock, name : str, memory : Memory) -> str:
+    """Checks if a memory block has a label and return the index of it
+
+    Args:
+        memblock (MemoryBlock): The memory block to find the index of
+        name (str): The name to find
+        memory (Memory): The memory to look in
+
+    Returns:
+        str: [description]
+    """
+    if memblock.label == name:
+        return memory.items.index(memblock)
+
+def findFirstVar(results : List[Union[None, int]]) -> Union[None, int]:
+    """Finds the first index in a list of none's
+
+    Args:
+        results (List[Union[None, int]]): A list of none's and integers
+
+    Returns(either):
+        int: The first item's value(index)
+        None: If there were no indexes in the list, return none
+    """
+    if len(results) == 0:
+        return None 
+    if results[0] is not None:
+        return results[0]
+    return findFirstVar(results[1:])
+
+def runWrite(word : str, rhs : List[str]):
+    """Writes a word to the terminal and if it's not the last word in the rhs, write a space
+
+    Args:
+        word (str): [description]
+        rhs (List[str]): [description]
+    """
+    print(word, end="")
+    if rhs.index(word) != len(rhs)-1:
+        print(" ", end="")
+
 class LookUpTable():
-    def __init__(self, items = []):
+    def __init__(self, items : List[LookUpItem]= []):
+        """Initializes a variable lookup table
+
+        Args:
+            items (List[LookUpItem], optional): A list of variables(look up item). Defaults to [].
+        """
         self.items = items 
     
-    def addVariable(self, item):
+    def addVariable(self, item : LookUpItem) -> LookUpTable:
+        """Return a new LookUpTable with the given lookUpItem added 
+
+        Args:
+            item (LookUpItem): The item to add
+
+        Returns:
+            LookUpTable: The new table with the item
+        """
         return LookUpTable(self.items + [item])
 
-    def addVariable(self, name, value):
-        # Check if variable exists:
-        # result = self.modVariable(name, value) 
-        # if result is None:
-        #     newItem = LookUpItem(name, value)
-        #     return LookUpTable(self.items + [newItem])
-        # else:
-        #     return result
+    def addVariable(self, name : str, value) -> LookUpTable:
+        """Create a new lookup item and return a new table with the created item
+
+        Args:
+            name (str): The item's name
+            value ([type]): The value of that item
+
+        Returns:
+            LookUpTable: The new lookup table with the added item
+        """
+        # Check if variable exists 
+        result = self.modVariable(name, value) 
+        if result is None:
             newItem = LookUpItem(name, value)
             return LookUpTable(self.items + [newItem])
+        else:
+            return result
 
-    def modVariable(self, name, value):
-        # loop through variables and for each check if it  works 
-        # No loop :)
-        for var in self.items:
-            if var.name == name:
-                index = self.items.index(var)
 
-                upperbound = index+1
+    def modVariable(self, name : str, value) -> Union[None, LookUpTable]:
+        """Modify a variable with the given name to the given value
 
-                items_without_mod = self.items[:index] + self.items[upperbound:]
-                table_without_mod = LookUpTable(items_without_mod)
-                table_with_mod = table_without_mod.addVariable(name, value)
-                return table_with_mod
-        return None 
+        Args:
+            name (str): The name of the variable to modify
+            value ([type]): The value to set the variable to
 
-    def increaseVariable(self, name, value):
+        Returns:
+            Union[None, LookUpTable]: Returns a new lookuptable with the modifies value if it exists, or return none if it's not found
+        """
+        results = list( map(lambda item: modvar(item, name, value, self.items), self.items) )
+        return findFirstVar(results)
+
+
+    def increaseVariable(self, name : str, value : int) -> LookUpTable:
+        """Add a number to a variable
+
+        Args:
+            name (str): The name of the variable to increase 
+            value (int): The value to increase the variable with 
+
+        Returns:
+            LookUpTable: The lookuptable with the increased variable
+        """
         oldvalue = self.getVariable(name)
         newvalue = int(oldvalue) + int(value) 
         return self.modVariable(name, newvalue)
     
-    def decreaseVariable(self, name, value):
+    def decreaseVariable(self, name : str, value : int) -> LookUpTable:
+        """Substract a number to a variable
+
+        Args:
+            name (str): The name of the variable to decrease 
+            value (int): The value to decrease the variable with 
+
+        Returns:
+            LookUpTable: The lookuptable with the decreased variable
+        """
         oldvalue = self.getVariable(name)
         newvalue = int(oldvalue) - int(value) 
         return self.modVariable(name, newvalue)
 
     def getVariable(self, name):
-        for var in self.items:
-            if var.name == name:
-                return var.value 
-        return None
+        results = list( map(lambda item: item.value if item.name == name else None, self.items) )
+        return findFirstVar(results)
 
 class LookUpItem():
-    def __init__(self, name, value):
+    def __init__(self, name : str, value):
+        """Initializes a variable with 
+
+        Args:
+            name (str): The variable's name 
+            value ([type]): The variable's value
+        """
         self.name = name 
         self.value = value 
     
@@ -148,70 +256,6 @@ class LocationMemoryBlock(MemoryBlock):
         """
         return pc+1
 
-def checkVar(memblock : MemoryBlock, name : str) -> Union[str, None]:
-    """Checks if the current memory block contains the var with the given name
-
-    Args:
-        memblock (MemoryBlock): The memory block to check
-        name (str): The variable's name
-
-    Returns(either):
-        str: The value of the variable 
-        None: If the value wasn't found, return None
-    """
-    if type(memblock) == AssignmentMemoryBlock:
-        if str(memblock.lhs) == str(name):
-            return memblock.rhs
-    return None
-
-def findFirstVar(results : List[Union[None, int]]) -> Union[None, int]:
-    """Finds the first index in a list of none's
-
-    Args:
-        results (List[Union[None, int]]): A list of none's and integers
-
-    Returns(either):
-        int: The first item's value(index)
-        None: If there were no indexes in the list, return none
-    """
-    if len(results) == 0:
-        return None 
-    if results[0] is not None:
-        return results[0]
-    return findFirstVar(results[1:])
-
-def findVar(memory : Memory, name : str) -> str:
-    """Attempts to find the value of a variable in the current memory block
-
-    Args:
-        memory (Memory): The memory
-        name (str): The variable's identifier
-
-    Returns:
-        str: Returns either the variable's value or the identifier if it's not found
-    """
-
-    oldvar = name
-    # result = list( map(checkVar, memory.items, name))
-    result = list( map(lambda item: checkVar(item, name) , memory.items))
-    newname = findFirstVar(result)
-   
-    if oldvar == newname:
-        print("Error: var not found")
-        return name
-    else:
-        return newname
-    
-def runWrite(word : str, rhs : List[str]):
-    """Writes a word to the terminal and if it's not the last word in the rhs, write a space
-
-    Args:
-        word (str): [description]
-        rhs (List[str]): [description]
-    """
-    print(word, end="")
-    if rhs.index(word) != len(rhs)-1:
-        print(" ", end="")
 
 
 class WriteMemoryBlock(MemoryBlock):
@@ -242,7 +286,6 @@ class WriteMemoryBlock(MemoryBlock):
         """
         if self.isVariable:
             # Find variable in memory and grab value
-            # value = [findVar(self.memory, self.rhs[0])]
             value = [table.getVariable(self.rhs[0])]
 
         else:
@@ -253,21 +296,6 @@ class WriteMemoryBlock(MemoryBlock):
         if self.writeLine:
             print("\n", end="")
         return pc+1
-
-
-def findLabel(memblock : MemoryBlock, name : str, memory : Memory) -> str:
-    """Checks if a memory block has a label and return the index of it
-
-    Args:
-        memblock (MemoryBlock): The memory block to find the index of
-        name (str): The name to find
-        memory (Memory): The memory to look in
-
-    Returns:
-        str: [description]
-    """
-    if memblock.label == name:
-        return memory.items.index(memblock)
 
 class GotoMemoryBlock(MemoryBlock):
     def __init__(self, label: str, rhs : str, memory : Memory):
@@ -321,50 +349,6 @@ class AssignmentMemoryBlock(MemoryBlock):
         newtable = table.addVariable(self.lhs, self.rhs)
         return (pc + 1, newtable)
 
-
-def findMemIndexByLhs(lhs : str, mem : Memory, memoryBlock : MemoryBlock):
-    if type(memoryBlock) == AssignmentMemoryBlock:
-        if memoryBlock.lhs == lhs:
-            return mem.items.index(memoryBlock)
-
-
-# No state change: 
-# def adjustValue(name : str, memory : Memory, operator : str, value : int):
-#     indexes = list( map(lambda item: findMemIndexByLhs(name, memory, item), memory.items) )
-
-#     # Find index of memory spot 
-#     firstIndex = findFirstVar(indexes)
-
-#     # Increase value of memory at index 
-#     if operator == '+':
-#         newItem = AssignmentMemoryBlock(memory.items[firstIndex].label, memory.items[firstIndex].lhs, int(memory.items[firstIndex].rhs) + int(value), memory.items[firstIndex].asstype)
-#     else: 
-#         # - 
-#         newItem = AssignmentMemoryBlock(memory.items[firstIndex].label, memory.items[firstIndex].lhs, int(memory.items[firstIndex].rhs) - int(value), memory.items[firstIndex].asstype)
-
-#     # Remove memory at index  -- by using new memory 
-#     newMemory = Memory(list( filter(lambda index: memory.items.index == index, memory.items) ), memory.pc)
-    
-#     # Place memory -- by using new memory 
-#     newMemoryWithItem = newMemory.push(newItem)
-
-#     return newMemoryWithItem
-def adjustValue(name : str, memory : Memory, operator : str, value : int):
-    indexes = list( map(lambda item: findMemIndexByLhs(name, memory, item), memory.items) )
-
-    # Find index of memory spot 
-    firstIndex =  findFirstVar(indexes)
-
-    # Increase value of memory at index 
-    if operator == '+':
-        # +
-        newItem = AssignmentMemoryBlock(memory.items[firstIndex].label, memory.items[firstIndex].lhs, str(int(memory.items[firstIndex].rhs) + int(value)), memory.items[firstIndex].asstype)
-    else: 
-        # - 
-        newItem = AssignmentMemoryBlock(memory.items[firstIndex].label, memory.items[firstIndex].lhs, str(int(memory.items[firstIndex].rhs) - int(value)), memory.items[firstIndex].asstype)
-
-    return (newItem, firstIndex)
-
 class AssignmentModMemoryBlock(MemoryBlock):
     def __init__(self, label: str, lhs: str, rhs : str, asstype : str, memory : Memory):
         """Initializes an assignment memory block
@@ -390,19 +374,7 @@ class AssignmentModMemoryBlock(MemoryBlock):
         Returns:
             int: The program counter after the memory block ran
         """
-        # if self.asstype == "+=":
-        #     print("Adding {} to {}".format(self.rhs, self.lhs))
-        #     memblock, index = adjustValue(self.lhs, self.memory, '+', self.rhs)
-        #     print("New block's val: {}".format(memblock.rhs))
 
-        #     self.memory.items[index] = memblock 
-
-        # elif self.asstype == "-=":
-        #     memblock, index = adjustValue(self.lhs, self.memory, '-', self.rhs)
-        #     self.memory.items[index] = memblock
-        # I know I am changing state here but I wasn't sure how to modify a value in memory the way I made this wihtout changing state. 
-        # However since it was just the memory I figured it was okay. My previous attempt is above(commented out with the 'no state change')
-        # The idea was to return a new Memory object and then use that, but my current run isn't written to support that...
         if self.asstype == "+=":
             newtable = table.increaseVariable(self.lhs, self.rhs)
         elif self.asstype == "-=":
@@ -437,9 +409,7 @@ class IfMemoryBlock(MemoryBlock):
             int: The program counter after the if statement
         """
         if self.compare_operator == '==':
-            # if findVar(self.memory, self.lhs) == findVar(self.memory, self.rhs):
             if str(table.getVariable(self.lhs)) == str(table.getVariable(self.rhs)):
-                # print(self.memory.items)
                 return pc + 1
 
         return pc+2
