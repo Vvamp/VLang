@@ -1,6 +1,6 @@
 from typing import List, Union
 import lexer, Token
-from ast_nodes import LocationNode, GotoNode, Node, WriteNode, WriteLnNode, AssignmentNode, IfNode, ExitNode, AssignmentModNode, JumpNode
+from ast_nodes import LocationNode, GotoNode, Node, WriteNode, WriteLnNode, AssignmentNode, IfNode, ExitNode, AssignmentModNode, JumpNode, WaitNode
 
 def checkIndexByType(results : List[int]) -> Union[int,None]: 
     """Recursively find the first index that is not none
@@ -126,6 +126,9 @@ def createAST(parsed_partmap : List[Token.Token], rootNode : Node) -> List[Node]
             static = True 
         
         thisNode = JumpNode(rootNode, parsed_partmap[1].symbol, static)
+    elif parsed_partmap[0].tokentype == "TIME" and parsed_partmap[0].symbol == "wait":
+        indexesUsed = 2 
+        thisNode = WaitNode(rootNode, parsed_partmap[1].symbol)
 
         # Next one is also part of the AST node 
     elif parsed_partmap[0].tokentype == "IGNORE":

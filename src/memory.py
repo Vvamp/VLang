@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, Tuple, Union
 import sys 
+import time 
 
 def modvar(item : LookUpItem, name : str, value, items : List[LookUpItem]) -> Union[None, LookUpTable]:
     """Modifies a variable with the given value
@@ -442,6 +443,29 @@ class JumpMemoryBlock(MemoryBlock):
             return int(self.rhs)
         else:
             return pc + int(self.rhs)
+
+class WaitMemoryBlock(MemoryBlock):
+    def __init__(self, label : str, rhs : str):
+        """Initializes a Wait memory block
+
+        Args:
+            label (str): The memory block's label 
+            rhs (str): The amount of seconds to wait
+        """
+        self.label = label 
+        self.rhs = rhs 
+    
+    def run(self, pc : int) -> int:
+        """Runs the wait block
+
+        Args:
+            pc (int): The current program counter
+
+        Returns:
+            int: The program counter after the wait was run
+        """
+        time.sleep(int(self.rhs))
+        return pc + 1
 
 class ExitMemoryBlock(MemoryBlock):
     def run(self, pc : int):

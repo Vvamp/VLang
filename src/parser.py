@@ -234,6 +234,26 @@ def check_exit(tokenlist : List[str], current_line : int) -> Tuple[bool, List[To
     alltokens = [Token.Token("EXIT", "exit", current_line)]
     return True, alltokens
 
+def check_wait(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
+    """Checks if the given construction is of the type 'exit'. If it is, the first value will return True and the second value will return a list of tokens. 
+    If it isn't of the type 'exit', the first value will return False and the second value wil return None or an error token.
+
+    Args:
+        tokenlist (List[str]): A list of strings consisting of an instruction and their parameters
+
+    Returns(either):
+        bool, List[Token.Token]: Returns a bool(whether the token is of this type) and a list of tokens, which is the instruction and the parameters.
+        bool, None             : Returns a bool(whether the token is of this type) and None 
+    """
+    nextToken,tokenlist2 = tokenlist.next()
+
+    if nextToken != 'wait':
+        return False, [Token.Token('ERROR', "Token is not of type 'wait'", current_line)] 
+
+    valueToken,tokenlist3 = tokenlist2.next()
+
+    alltokens = [Token.Token("TIME", 'wait', current_line), Token.Token('VALUE', valueToken, current_line)]
+    return True, alltokens
 
 def check_assignment(tokenlist : List[str], current_line : int) -> Tuple[bool, List[Token.Token]]:
     """Checks if the given construction is of the type 'assignment'. If it is, the first value will return True and the second value will return a list of tokens. 
@@ -353,6 +373,11 @@ def parse_tokens(tokenlist : List[str], current_line : int) -> List[Token.Token]
 
     # Check if the current instruction is a jumpto statement 
     result,checktokens = check_jumpto(copy.deepcopy(thetokenlist), current_line)
+    if result:
+        return checktokens
+
+    # Check if the current instruction is a wait statement 
+    result,checktokens = check_wait(copy.deepcopy(thetokenlist), current_line)
     if result:
         return checktokens
 

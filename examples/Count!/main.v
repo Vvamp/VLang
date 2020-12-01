@@ -25,7 +25,14 @@ writeLine "Going Down!"
 location loop_down 
 writeLine start 
 if start == countDownGoal 
-    exit 
+    jump 3 
 start -= 1
 goto loop_down 
-
+writeLine "GoodBye"
+wait 3
+writeLine "Jk. Let's go again!"
+wait 1
+start = 1 
+goalWasReached = 0
+jumpTo 6
+exit
